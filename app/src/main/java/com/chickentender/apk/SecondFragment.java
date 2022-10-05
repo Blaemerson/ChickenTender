@@ -11,6 +11,8 @@ import androidx.navigation.fragment.NavHostFragment;
 
 import com.chickentender.apk.databinding.FragmentSecondBinding;
 
+import java.util.Random;
+
 public class SecondFragment extends Fragment {
 
     private FragmentSecondBinding binding;
@@ -27,8 +29,15 @@ public class SecondFragment extends Fragment {
     }
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
+        String zeros = "000000";
+        Random rnd = new Random();
+        String s = String.format("%06x", rnd.nextInt(0x1000000));
+        s = zeros.substring(s.length()) + s;
+        System.out.println("s = " + s);
+
         super.onViewCreated(view, savedInstanceState);
 
+        binding.textviewSecond.append(s);
         binding.buttonSecond.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
