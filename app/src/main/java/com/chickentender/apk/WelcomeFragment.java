@@ -9,11 +9,12 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 
-import com.chickentender.apk.databinding.FragmentFirstBinding;
+import com.chickentender.apk.databinding.FragmentCreateRoomBinding;
+import com.chickentender.apk.databinding.FragmentWelcomeBinding;
 
-public class FirstFragment extends Fragment {
+public class WelcomeFragment extends Fragment {
 
-    private FragmentFirstBinding binding;
+    private FragmentWelcomeBinding binding;
 
     @Override
     public View onCreateView(
@@ -21,7 +22,7 @@ public class FirstFragment extends Fragment {
             Bundle savedInstanceState
     ) {
 
-        binding = FragmentFirstBinding.inflate(inflater, container, false);
+        binding = FragmentWelcomeBinding.inflate(inflater, container, false);
         return binding.getRoot();
 
     }
@@ -29,10 +30,10 @@ public class FirstFragment extends Fragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        binding.buttonFirst.setOnClickListener(view12 -> NavHostFragment.findNavController(FirstFragment.this)
-                .navigate(R.id.action_FirstFragment_to_SecondFragment));
-        binding.buttonSecond.setOnClickListener(view1 -> NavHostFragment.findNavController(FirstFragment.this)
-                .navigate(R.id.action_FirstFragment_to_SecondFragment));
+        binding.buttonJoinRoom.setOnClickListener(view12 -> NavHostFragment.findNavController(WelcomeFragment.this)
+                .navigate(R.id.action_WelcomeFragment_to_CreateRoomFragment));
+        binding.buttonCreateRoom.setOnClickListener(view1 -> NavHostFragment.findNavController(WelcomeFragment.this)
+                .navigate(R.id.action_WelcomeFragment_to_CreateRoomFragment));
     }
 
     @Override

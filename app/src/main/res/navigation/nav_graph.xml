@@ -7,19 +7,19 @@
 
     <fragment
         android:id="@+id/FirstFragment"
-        android:name="com.chickentender.apk.FirstFragment"
+        android:name="com.chickentender.apk.WelcomeFragment"
         android:label="@string/first_fragment_label"
-        tools:layout="@layout/fragment_first">
+        tools:layout="@layout/fragment_welcome">
 
         <action
-            android:id="@+id/action_FirstFragment_to_SecondFragment"
+            android:id="@+id/action_WelcomeFragment_to_CreateRoomFragment"
             app:destination="@id/SecondFragment" />
     </fragment>
     <fragment
         android:id="@+id/SecondFragment"
-        android:name="com.chickentender.apk.SecondFragment"
+        android:name="com.chickentender.apk.CreateRoomFragment"
         android:label="@string/second_fragment_label"
-        tools:layout="@layout/fragment_second">
+        tools:layout="@layout/fragment_create_room">
 
         <action
             android:id="@+id/action_SecondFragment_to_FirstFragment"
