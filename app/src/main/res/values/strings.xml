@@ -6,6 +6,7 @@
     <string name="second_fragment_label">Create a Room</string>
     <string name="next">Next</string>
     <string name="previous">Previous</string>
+    <string name="build_room">Build Room</string>
     <string name="join">JOIN</string>
     <string name="create">CREATE</string>
 

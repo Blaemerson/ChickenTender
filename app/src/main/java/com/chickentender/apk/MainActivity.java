@@ -14,11 +14,21 @@ import com.chickentender.apk.databinding.ActivityMainBinding;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import org.json.JSONObject;
+
 public class MainActivity extends AppCompatActivity {
 
     private AppBarConfiguration appBarConfiguration;
     private ActivityMainBinding binding;
+    private Room activeRoom;
 
+    public void createRoom(String name, Restaurant[] restaurants, double lat, double lng) {
+        activeRoom = new Room(name, restaurants, "", 1500, lat, lng);
+    }
+
+    public void setText(String str) {
+        binding.textView.setText(str);
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -31,14 +41,11 @@ public class MainActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
         appBarConfiguration = new AppBarConfiguration.Builder(navController.getGraph()).build();
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
-
-//        binding.fab.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
-//            }
-//        });
+        if (activeRoom == null) {
+            binding.textView.setText("No room active");
+        } else {
+            binding.textView.setText(activeRoom.getName());
+        }
     }
 
     @Override
@@ -65,6 +72,11 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onSupportNavigateUp() {
+        if (activeRoom == null) {
+            binding.textView.setText("No room active");
+        } else {
+            binding.textView.setText(activeRoom.getName());
+        }
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
         return NavigationUI.navigateUp(navController, appBarConfiguration)
                 || super.onSupportNavigateUp();
