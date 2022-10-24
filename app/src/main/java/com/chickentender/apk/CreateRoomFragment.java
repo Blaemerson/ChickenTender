@@ -13,9 +13,13 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Looper;
 import android.provider.Settings;
+import android.text.TextWatcher;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,14 +36,14 @@ import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.net.PlacesClient;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 import java.io.IOException;
-import java.util.List;
 
 import okhttp3.FormBody;
 import okhttp3.MediaType;
@@ -51,23 +55,22 @@ import okhttp3.Response;
 
 public class CreateRoomFragment extends Fragment {
     private FragmentCreateRoomBinding binding;
-    private FusedLocationProviderClient flpc;
-    private JSONObject[] jsonObjects;
+    private FusedLocationProviderClient fusedLocationProviderClient;
     private double lat;
     private double lng;
+    private double radiusMeters = 1500;
+    private double radiusMiles = 15;
 
     @Override
     public View onCreateView(
             LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState
     ) {
-        flpc = LocationServices.getFusedLocationProviderClient(this.getActivity());
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this.getActivity());
         requestNewLocationData();
-//        getLastLocation();
 
         binding = FragmentCreateRoomBinding.inflate(inflater, container, false);
         return binding.getRoot();
-
     }
 
     @SuppressLint("MissingPermission")
@@ -78,11 +81,8 @@ public class CreateRoomFragment extends Fragment {
             // check if location is enabled
             if (isLocationEnabled()) {
 
-                // getting last
-                // location from
-                // FusedLocationClient
-                // object
-                flpc.getLastLocation().addOnCompleteListener(new OnCompleteListener<Location>() {
+                // getting last location from FusedLocationClient object
+                fusedLocationProviderClient.getLastLocation().addOnCompleteListener(new OnCompleteListener<Location>() {
                     @Override
                     public void onComplete(@NonNull Task<Location> task) {
                         Location location = task.getResult();
@@ -101,7 +101,7 @@ public class CreateRoomFragment extends Fragment {
             }
         } else {
             // if permissions aren't available,
-            // request for permissions
+            // request permissions
             requestPermissions();
         }
     }
@@ -109,18 +109,16 @@ public class CreateRoomFragment extends Fragment {
     @SuppressLint("MissingPermission")
     private void requestNewLocationData() {
 
-        // Initializing LocationRequest
-        // object with appropriate methods
+        // Initializing LocationRequest object with appropriate methods
         LocationRequest mLocationRequest = new LocationRequest();
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         mLocationRequest.setInterval(5);
         mLocationRequest.setFastestInterval(0);
         mLocationRequest.setNumUpdates(1);
 
-        // setting LocationRequest
-        // on FusedLocationClient
-        flpc = LocationServices.getFusedLocationProviderClient(this.getActivity());
-        flpc.requestLocationUpdates(mLocationRequest, mLocationCallback, Looper.myLooper());
+        // setting LocationRequest on FusedLocationClient
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this.getActivity());
+        fusedLocationProviderClient.requestLocationUpdates(mLocationRequest, mLocationCallback, Looper.myLooper());
     }
 
     private LocationCallback mLocationCallback = new LocationCallback() {
@@ -138,8 +136,7 @@ public class CreateRoomFragment extends Fragment {
         return ActivityCompat.checkSelfPermission(this.getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this.getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
 
         // If we want background location
-        // on Android 10.0 and higher,
-        // use:
+        // on Android 10.0 and higher, use:
         // ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED
     }
 
@@ -150,8 +147,6 @@ public class CreateRoomFragment extends Fragment {
                 Manifest.permission.ACCESS_FINE_LOCATION}, 44);
     }
 
-    // method to check
-    // if location is enabled
     private boolean isLocationEnabled() {
         LocationManager locationManager = (LocationManager) this.getActivity().getSystemService(Context.LOCATION_SERVICE);
         return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
@@ -171,8 +166,8 @@ public class CreateRoomFragment extends Fragment {
         binding.buttonBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                System.out.println(lat);
-                System.out.println(lng);
+                System.out.println("lat: " + lat);
+                System.out.println("lng: " + lng);
                 NavHostFragment.findNavController(CreateRoomFragment.this)
                         .navigate(R.id.action_SecondFragment_to_FirstFragment);
             }
@@ -181,6 +176,20 @@ public class CreateRoomFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 new PlaceFetcher(view.getContext()).execute();
+            }
+        });
+        binding.editTextNumber.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
+                if (i == EditorInfo.IME_ACTION_DONE) {
+                    InputMethodManager imm = (InputMethodManager)textView.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(textView.getWindowToken(), 0);
+                    radiusMiles = Integer.parseInt(textView.getText().toString());
+                    System.out.println(radiusMiles);
+                    return true;
+                }
+
+                return true;
             }
         });
 
@@ -195,23 +204,24 @@ public class CreateRoomFragment extends Fragment {
     private void onBackgroundTaskDataObtained(JSONObject[] results) throws JSONException {
         Restaurant[] restaurants = new Restaurant[results.length];
         if (results.length == 0) {
-            ((MainActivity)getActivity()).createRoom("No results", restaurants, lat, lng);
+            ((MainActivity)getActivity()).setText("No results in " + radiusMiles + " miles");
         } else{
             for (int i = 0; i < results.length; i++) {
                 restaurants[i] = new Restaurant((String) results[i].get("name"), 0, 0, "");
             }
             ((MainActivity)getActivity()).createRoom(restaurants[0].getName(), restaurants, lat, lng);
-            ((MainActivity)getActivity()).setText(String.valueOf(restaurants.length));
+            ((MainActivity)getActivity()).setText("Number of restaurants within " + radiusMiles + " miles: " + restaurants.length);
         }
     }
 
-    public String buildQuery() {
-        String _apiKey = MAPS_API_KEY;
-
+    public String buildQuery(String pageToken) {
         return "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location="
                 + lat + "," + lng
-                + "&radius=5000&type=restaurant&key="
-                + _apiKey + "\n";
+                + "&radius=" + radiusMiles * 1609.34
+                + "&type=restaurant"
+                + "&pageToken=" + pageToken
+                + "&key=" + MAPS_API_KEY
+                + "\n";
     }
 
 
@@ -219,8 +229,7 @@ public class CreateRoomFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (getArguments() != null) {
-        }
+        if (getArguments() != null) { }
 
         new PlaceFetcher(getContext()).execute();
     }
@@ -244,6 +253,7 @@ public class CreateRoomFragment extends Fragment {
                 JSONObject Jobject = new JSONObject(jsonData);
                 JSONArray Jarray = Jobject.getJSONArray("results");
                 places = new JSONObject[Jarray.length()];
+                System.out.println(jsonData);
 
                 for (int i = 0; i < Jarray.length(); i++) {
                     JSONObject object     = Jarray.getJSONObject(i);
@@ -266,7 +276,7 @@ public class CreateRoomFragment extends Fragment {
 
         @Override
         protected JSONObject[] doInBackground(String... params) {
-            JSONObject[] obs = request(buildQuery());
+            JSONObject[] obs = request(buildQuery(""));
             System.out.println(obs.length);
             return obs;
         }
