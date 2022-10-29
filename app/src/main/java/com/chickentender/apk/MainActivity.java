@@ -24,10 +24,10 @@ public class MainActivity extends AppCompatActivity {
     public void createRoom(String name, Restaurant[] restaurants, double lat, double lng) {
         activeRoom = new Room(name, restaurants, "", 1500, lat, lng);
     }
-
-    public void setText(String str) {
-        binding.textView.setText(str);
+    public Room getActiveRoom() {
+        return activeRoom;
     }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,11 +38,6 @@ public class MainActivity extends AppCompatActivity {
 //        setSupportActionBar(binding.toolbar);
 
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
-        if (activeRoom == null) {
-            binding.textView.setText("No room active");
-        } else {
-            binding.textView.setText(activeRoom.getName());
-        }
     }
 
     @Override

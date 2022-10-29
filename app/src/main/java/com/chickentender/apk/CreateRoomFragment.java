@@ -67,10 +67,8 @@ public class CreateRoomFragment extends Fragment {
             LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState
     ) {
-        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this.getActivity());
-        requestPermissions();
-        requestNewLocationData();
 
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this.getActivity());
         binding = FragmentCreateRoomBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
@@ -175,6 +173,8 @@ public class CreateRoomFragment extends Fragment {
         binding.buildRoom.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                requestPermissions();
+                requestNewLocationData();
                 new PlaceFetcher(view.getContext()).execute();
             }
         });
@@ -203,13 +203,8 @@ public class CreateRoomFragment extends Fragment {
 
     private void onBackgroundTaskDataObtained(JSONObject[] results) throws JSONException {
         Restaurant[] restaurants = extractRestaurantData(results);
-
-        if (restaurants.length == 0) {
-            ((MainActivity)getActivity()).setText("No results in " + radiusMiles + " miles");
-        } else{
-            ((MainActivity)getActivity()).createRoom("", restaurants, lat, lng);
-            ((MainActivity)getActivity()).setText("Number of restaurants within " + radiusMiles + " miles: " + restaurants.length);
-        }
+        // Change name of room to hoseID
+        ((MainActivity) getActivity()).createRoom("Room1: Restaurants: " + restaurants.length, restaurants, lat, lng);
     }
 
     public String buildQuery(String pageToken) {

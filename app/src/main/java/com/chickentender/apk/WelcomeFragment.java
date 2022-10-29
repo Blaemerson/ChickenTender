@@ -31,9 +31,15 @@ public class WelcomeFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         binding.buttonJoinRoom.setOnClickListener(view12 -> NavHostFragment.findNavController(WelcomeFragment.this)
-                .navigate(R.id.action_WelcomeFragment_to_CreateRoomFragment));
+                .navigate(R.id.action_WelcomeFragment_to_JoinRoomFragment));
         binding.buttonCreateRoom.setOnClickListener(view1 -> NavHostFragment.findNavController(WelcomeFragment.this)
                 .navigate(R.id.action_WelcomeFragment_to_CreateRoomFragment));
+
+        if (((MainActivity) getActivity()).getActiveRoom() == null) {
+            binding.textView.setText("No room active");
+        } else {
+            binding.textView.setText(((MainActivity) getActivity()).getActiveRoom().getName());
+        }
     }
 
     @Override
