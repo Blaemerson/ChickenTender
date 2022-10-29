@@ -17,6 +17,7 @@
         android:gravity="center"
         android:textSize="30sp"
         android:imeOptions="actionDone"
+        android:hint="Search radius"
         app:layout_constraintBottom_toTopOf="@id/button_back"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -26,21 +27,25 @@
         android:id="@+id/build_room"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:scaleX="2"
+        android:scaleY="2"
         android:text="@string/build_room"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/editTextNumber" />
 
-    <Button
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/button_back"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/previous"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/build_room" />
+        android:layout_gravity="start|bottom"
+        android:src="@drawable/quantum_ic_arrow_back_grey600_24"
+        android:contentDescription="Go Back"
+        android:layout_margin="16dp" />
 
 
 

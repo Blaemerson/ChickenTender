@@ -58,6 +58,7 @@ public class CreateRoomFragment extends Fragment {
     private FusedLocationProviderClient fusedLocationProviderClient;
     private double lat;
     private double lng;
+    private String roomName;
     private double radiusMeters = 1500;
     private double radiusMiles = 15;
 
@@ -67,6 +68,7 @@ public class CreateRoomFragment extends Fragment {
             Bundle savedInstanceState
     ) {
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this.getActivity());
+        requestPermissions();
         requestNewLocationData();
 
         binding = FragmentCreateRoomBinding.inflate(inflater, container, false);
@@ -166,8 +168,6 @@ public class CreateRoomFragment extends Fragment {
         binding.buttonBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                System.out.println("lat: " + lat);
-                System.out.println("lng: " + lng);
                 NavHostFragment.findNavController(CreateRoomFragment.this)
                         .navigate(R.id.action_SecondFragment_to_FirstFragment);
             }
@@ -202,14 +202,12 @@ public class CreateRoomFragment extends Fragment {
     }
 
     private void onBackgroundTaskDataObtained(JSONObject[] results) throws JSONException {
-        Restaurant[] restaurants = new Restaurant[results.length];
-        if (results.length == 0) {
+        Restaurant[] restaurants = extractRestaurantData(results);
+
+        if (restaurants.length == 0) {
             ((MainActivity)getActivity()).setText("No results in " + radiusMiles + " miles");
         } else{
-            for (int i = 0; i < results.length; i++) {
-                restaurants[i] = new Restaurant((String) results[i].get("name"), 0, 0, "");
-            }
-            ((MainActivity)getActivity()).createRoom(restaurants[0].getName(), restaurants, lat, lng);
+            ((MainActivity)getActivity()).createRoom("", restaurants, lat, lng);
             ((MainActivity)getActivity()).setText("Number of restaurants within " + radiusMiles + " miles: " + restaurants.length);
         }
     }
@@ -222,6 +220,21 @@ public class CreateRoomFragment extends Fragment {
                 + "&pageToken=" + pageToken
                 + "&key=" + MAPS_API_KEY
                 + "\n";
+    }
+
+    public Restaurant[] extractRestaurantData(JSONObject[] jsonData) throws JSONException {
+        Restaurant[] restaurants = new Restaurant[jsonData.length];
+        for (int i = 0; i < jsonData.length; i++) {
+            restaurants[i] = new Restaurant(
+                    jsonData[i].get("name").toString(),
+                    jsonData[i].get("vicinity").toString(),
+                    (double) jsonData[i].getJSONObject("geometry").getJSONObject("location").get("lng"),
+                    (double) jsonData[i].getJSONObject("geometry").getJSONObject("location").get("lat"),
+                    ""
+            );
+            System.out.println(restaurants[i].toString());
+        }
+        return restaurants;
     }
 
 
@@ -253,13 +266,13 @@ public class CreateRoomFragment extends Fragment {
                 JSONObject Jobject = new JSONObject(jsonData);
                 JSONArray Jarray = Jobject.getJSONArray("results");
                 places = new JSONObject[Jarray.length()];
-                System.out.println(jsonData);
 
                 for (int i = 0; i < Jarray.length(); i++) {
                     JSONObject object     = Jarray.getJSONObject(i);
 
                     places[i] = object;
-                    System.out.println(places[i].get("name") + " @ " + places[i].get("vicinity"));
+//                    System.out.println(places[i]) + " @ " + places[i].get("vicinity"));
+                    System.out.println(places[i]);
                 }
             }  catch (JSONException | IOException e) {
                 e.printStackTrace();
