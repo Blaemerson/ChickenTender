@@ -34,6 +34,9 @@ public class Room {
     public void setRestaurants(Restaurant[] restaurants) {
         this.restaurants = restaurants;
     }
+    public Restaurant[] getRestaurants() {
+        return restaurants;
+    }
 
     public void addRestaurant(Restaurant restaurant) {
         Restaurant[] updated = new Restaurant[restaurants.length + 1];

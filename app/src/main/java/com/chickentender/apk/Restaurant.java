@@ -31,6 +31,9 @@ public class Restaurant {
     public String getName() {
         return name;
     }
+    public String getVicinity() {
+        return vicinity;
+    }
 
     public double getLatitude() {
         return latitude;

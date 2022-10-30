@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.chickentender.apk.databinding.FragmentCreateRoomBinding;
 import com.chickentender.apk.databinding.FragmentJoinRoomBinding;
@@ -92,6 +93,7 @@ public class JoinRoomFragment extends Fragment {
         binding.buttonRoomSearch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Toast.makeText(view.getContext(), "Joined Room", Toast.LENGTH_LONG).show();
                 // TODO: get room from server
             }
         });

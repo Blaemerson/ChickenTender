@@ -21,8 +21,11 @@ public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
     private Room activeRoom;
 
-    public void createRoom(String name, Restaurant[] restaurants, double lat, double lng) {
-        activeRoom = new Room(name, restaurants, "", 1500, lat, lng);
+    public void createRoom(String name, Restaurant[] restaurants, double radius, double lat, double lng) {
+        activeRoom = new Room(name, restaurants, "", radius, lat, lng);
+    }
+    public void deleteRoom() {
+        this.activeRoom = null;
     }
     public Room getActiveRoom() {
         return activeRoom;

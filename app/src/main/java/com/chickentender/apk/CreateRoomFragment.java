@@ -173,11 +173,18 @@ public class CreateRoomFragment extends Fragment {
         binding.buildRoom.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                requestPermissions();
-                requestNewLocationData();
-                new PlaceFetcher(view.getContext()).execute();
+                if (!checkPermissions()) {
+                    requestPermissions();
+                } else {
+                    requestNewLocationData();
+                    new PlaceFetcher(view.getContext()).execute();
+                }
             }
         });
+
+        // Disable build room button
+        binding.buildRoom.setAlpha(.4f);
+        binding.buildRoom.setClickable(false);
         binding.editTextNumber.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
@@ -186,6 +193,11 @@ public class CreateRoomFragment extends Fragment {
                     imm.hideSoftInputFromWindow(textView.getWindowToken(), 0);
                     radiusMiles = Integer.parseInt(textView.getText().toString());
                     System.out.println(radiusMiles);
+                    // Enable build room button
+                    if (textView.getText().length() > 0) {
+                        binding.buildRoom.setAlpha(1f);
+                        binding.buildRoom.setClickable(true);
+                    }
                     return true;
                 }
 
@@ -203,8 +215,14 @@ public class CreateRoomFragment extends Fragment {
 
     private void onBackgroundTaskDataObtained(JSONObject[] results) throws JSONException {
         Restaurant[] restaurants = extractRestaurantData(results);
-        // Change name of room to hoseID
-        ((MainActivity) getActivity()).createRoom("Room1: Restaurants: " + restaurants.length, restaurants, lat, lng);
+        if (restaurants.length > 0) {
+            ((MainActivity) getActivity()).createRoom("Room1: Restaurants: " + restaurants.length, restaurants, radiusMiles, lat, lng);
+            Toast.makeText(this.getContext(), "Room Created", Toast.LENGTH_LONG).show();
+            NavHostFragment.findNavController(CreateRoomFragment.this)
+                    .navigate(R.id.action_SecondFragment_to_FirstFragment);
+        } else {
+            Toast.makeText(this.getContext(), "No restaurants found", Toast.LENGTH_LONG).show();
+        }
     }
 
     public String buildQuery(String pageToken) {
@@ -223,8 +241,8 @@ public class CreateRoomFragment extends Fragment {
             restaurants[i] = new Restaurant(
                     jsonData[i].get("name").toString(),
                     jsonData[i].get("vicinity").toString(),
-                    (double) jsonData[i].getJSONObject("geometry").getJSONObject("location").get("lng"),
                     (double) jsonData[i].getJSONObject("geometry").getJSONObject("location").get("lat"),
+                    (double) jsonData[i].getJSONObject("geometry").getJSONObject("location").get("lng"),
                     ""
             );
             System.out.println(restaurants[i].toString());
@@ -237,9 +255,9 @@ public class CreateRoomFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (getArguments() != null) { }
-
-        new PlaceFetcher(getContext()).execute();
+//        if (getArguments() != null) { }
+//
+//        new PlaceFetcher(getContext()).execute();
     }
 
     class PlaceFetcher extends AsyncTask<String, Void, JSONObject[]> {
