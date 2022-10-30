@@ -2,25 +2,25 @@ package com.chickentender.apk;
 
 public class Restaurant {
     private String name;
-    private String rawJsonString;
     private String vicinity;
     private double latitude;
     private double longitude;
+    private String userRating;
     private String photo;
 
-    public Restaurant(String name, String vicinity, double latitude, double longitude, String photo) {
+    public Restaurant(String name, String vicinity, double latitude, double longitude) {
         this.name = name;
         this.vicinity = vicinity;
         this.latitude = latitude;
         this.longitude = longitude;
-        this.photo = photo;
     }
 
-    public Restaurant(String name, double latitude, double longitude, String photo) {
+    public Restaurant(String name, String vicinity, double latitude, double longitude, String userRating) {
         this.name = name;
+        this.vicinity = vicinity;
         this.latitude = latitude;
         this.longitude = longitude;
-        this.photo = photo;
+        this.userRating = userRating;
     }
 
     @Override
@@ -28,6 +28,7 @@ public class Restaurant {
         return name + " " + vicinity + " " + latitude + " "  + longitude + " "  + photo;
     }
 
+    public String getUserRating() { return userRating; }
     public String getName() {
         return name;
     }

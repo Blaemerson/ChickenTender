@@ -225,9 +225,12 @@ public class CreateRoomFragment extends Fragment {
         }
     }
 
+    // Construct a query for to submit to Google Maps
+    // Input: a page token for which page of results to pull
+    // Output: a query be to sent to Google
     public String buildQuery(String pageToken) {
-        return "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location="
-                + lat + "," + lng
+        return "https://maps.googleapis.com/maps/api/place/nearbysearch/json?"
+                + "location=" + lat + "," + lng
                 + "&radius=" + radiusMiles * 1609.34
                 + "&type=restaurant"
                 + "&pageToken=" + pageToken
@@ -235,17 +238,30 @@ public class CreateRoomFragment extends Fragment {
                 + "\n";
     }
 
+    // Parse JSON data obtained from Google and store it into a list of restaurants
+    // Input: an array of Place data in JSON format.
+    // Output: an array of Restaurants parsed from JSON data.
     public Restaurant[] extractRestaurantData(JSONObject[] jsonData) throws JSONException {
         Restaurant[] restaurants = new Restaurant[jsonData.length];
         for (int i = 0; i < jsonData.length; i++) {
+
+            // Get data fields
+            String name = jsonData[i].get("name").toString();
+            String vicinity = jsonData[i].get("vicinity").toString();
+            JSONObject location = jsonData[i].getJSONObject("geometry")
+                                             .getJSONObject("location");
+            double latitude = (double) location.get("lat");
+            System.out.println(name);
+            double longitude = (double) location.get("lat");
+            String userRating = jsonData[i].get("rating").toString();
+
             restaurants[i] = new Restaurant(
-                    jsonData[i].get("name").toString(),
-                    jsonData[i].get("vicinity").toString(),
-                    (double) jsonData[i].getJSONObject("geometry").getJSONObject("location").get("lat"),
-                    (double) jsonData[i].getJSONObject("geometry").getJSONObject("location").get("lng"),
-                    ""
+                    name,
+                    vicinity,
+                    longitude,
+                    latitude,
+                    userRating
             );
-            System.out.println(restaurants[i].toString());
         }
         return restaurants;
     }
@@ -254,14 +270,15 @@ public class CreateRoomFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-//        if (getArguments() != null) { }
-//
-//        new PlaceFetcher(getContext()).execute();
     }
 
-    class PlaceFetcher extends AsyncTask<String, Void, JSONObject[]> {
+    // Since HTTP requests can't be made on the main thread,
+    // this class is used to make the request asynchronously
+    private class PlaceFetcher extends AsyncTask<String, Void, JSONObject[]> {
 
+        // Create the HTTP Connection
+        // Input: a query to be sent to Google Places API
+        // Output: an array of Places as JSONObjects
         public JSONObject[] request(String query) {
             JSONObject[] places = null;
             OkHttpClient client = new OkHttpClient().newBuilder()
@@ -292,21 +309,16 @@ public class CreateRoomFragment extends Fragment {
             }
             return places;
         }
-        private final Context context;
 
-        public PlaceFetcher(Context c){
-
-            this.context = c;
-        }
-
-
+        // Make the request in the background
+        // Output: an list of JSON objects
         @Override
         protected JSONObject[] doInBackground(String... params) {
-            JSONObject[] obs = request(buildQuery(""));
-            System.out.println(obs.length);
-            return obs;
+            JSONObject[] places = request(buildQuery(""));
+            return places;
         }
 
+        // Update the user interface with obtained data
         @Override
         protected void onPostExecute(JSONObject[] result) {
             try {
@@ -315,5 +327,15 @@ public class CreateRoomFragment extends Fragment {
                 e.printStackTrace();
             }
         }
+
+
+        private final Context context;
+
+        public PlaceFetcher(Context c){
+            this.context = c;
+        }
+
+
+
     }
 }

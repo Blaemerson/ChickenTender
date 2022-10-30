@@ -41,7 +41,7 @@ public class WelcomeFragment extends Fragment {
         // Fill list with names and general areas of restaurants
         for (Restaurant r : ((MainActivity)getActivity()).getActiveRoom().getRestaurants())
         {
-            names.add(r.getName() + " - " + r.getVicinity());
+            names.add(r.getName() + "\n" + r.getVicinity() + "\nRating: " + r.getUserRating());
         }
         intent.putStringArrayListExtra("listview", names);
         startActivity(intent);
