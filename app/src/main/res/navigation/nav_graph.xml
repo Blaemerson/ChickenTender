@@ -17,6 +17,9 @@
         <action
             android:id="@+id/action_WelcomeFragment_to_JoinRoomFragment"
             app:destination="@id/ThirdFragment" />
+        <action
+            android:id="@+id/action_WelcomeFragment_to_VotingFragment"
+            app:destination="@id/VotingFragment" />
     </fragment>
 
 
@@ -40,4 +43,16 @@
             android:id="@+id/action_ThirdFragment_to_FirstFragment"
             app:destination="@id/FirstFragment" />
     </fragment>
+
+    <fragment
+        android:id="@+id/VotingFragment"
+        android:name="com.chickentender.apk.VotingFragment"
+        android:label="Begin Voting"
+        tools:layout="@layout/fragment_voting">
+
+        <action
+            android:id="@+id/action_WelcomeFragment_to_VotingFragment"
+            app:destination="@id/VotingFragment" />
+    </fragment>
+
 </navigation>

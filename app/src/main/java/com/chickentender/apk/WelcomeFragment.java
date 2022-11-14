@@ -53,6 +53,9 @@ public class WelcomeFragment extends Fragment {
 
         binding.buttonDeleteRoom.setVisibility(View.GONE);
         binding.buttonRestaurantList.setVisibility(View.GONE);
+        binding.buttonBeginVoting.setVisibility(View.GONE);
+        binding.buttonBeginVoting.setOnClickListener(view12 -> NavHostFragment.findNavController(WelcomeFragment.this)
+                .navigate(R.id.action_WelcomeFragment_to_VotingFragment));
         binding.buttonJoinRoom.setOnClickListener(view12 -> NavHostFragment.findNavController(WelcomeFragment.this)
                 .navigate(R.id.action_WelcomeFragment_to_JoinRoomFragment));
         binding.buttonCreateRoom.setOnClickListener(view1 -> NavHostFragment.findNavController(WelcomeFragment.this)
@@ -79,7 +82,7 @@ public class WelcomeFragment extends Fragment {
             binding.buttonCreateRoom.setVisibility(View.GONE);
             binding.buttonJoinRoom.setVisibility(View.GONE);
             binding.buttonDeleteRoom.setVisibility(View.VISIBLE);
-            binding.buttonRestaurantList.setVisibility(View.VISIBLE);
+            binding.buttonBeginVoting.setVisibility(View.VISIBLE);
             binding.textView.setText(((MainActivity) getActivity()).getActiveRoom().getName());
         }
     }
