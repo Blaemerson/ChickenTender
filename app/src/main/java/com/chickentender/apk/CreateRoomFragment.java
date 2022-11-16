@@ -20,6 +20,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -60,14 +63,13 @@ public class CreateRoomFragment extends Fragment {
     private double lng;
     private String roomName;
     private double radiusMeters = 1500;
-    private double radiusMiles = 15;
+    private double radiusMiles;
 
     @Override
     public View onCreateView(
             LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState
     ) {
-
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this.getActivity());
         binding = FragmentCreateRoomBinding.inflate(inflater, container, false);
         return binding.getRoot();
@@ -95,7 +97,7 @@ public class CreateRoomFragment extends Fragment {
                     }
                 });
             } else {
-                Toast.makeText(this.getActivity(), "Please turn on" + " your location...", Toast.LENGTH_LONG).show();
+                Toast.makeText(this.getActivity(), "Please turn on" + " your location...", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
                 startActivity(intent);
             }
@@ -163,6 +165,16 @@ public class CreateRoomFragment extends Fragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+//        Spinner spinner = (Spinner) findViewById(R.id.distance_spinner);
+        Spinner spinner = binding.distanceSpinner;
+        // Create an ArrayAdapter using the string array and a default spinner layout
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this.getContext(),
+                R.array.distances_array, R.layout.spinner_item);
+        // Specify the layout to use when the list of choices appears
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        // Apply the adapter to the spinner
+        spinner.setAdapter(adapter);
+
         binding.buttonBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -173,6 +185,7 @@ public class CreateRoomFragment extends Fragment {
         binding.buildRoom.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                System.out.println("here1");
                 if (!checkPermissions()) {
                     requestPermissions();
                 } else {
@@ -181,29 +194,42 @@ public class CreateRoomFragment extends Fragment {
                 }
             }
         });
-
-        // Disable build room button
-        binding.buildRoom.setAlpha(.4f);
-        binding.buildRoom.setClickable(false);
-        binding.editTextNumber.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+        binding.distanceSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
-            public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
-                if (i == EditorInfo.IME_ACTION_DONE) {
-                    InputMethodManager imm = (InputMethodManager)textView.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-                    imm.hideSoftInputFromWindow(textView.getWindowToken(), 0);
-                    radiusMiles = Integer.parseInt(textView.getText().toString());
-                    System.out.println(radiusMiles);
-                    // Enable build room button
-                    if (textView.getText().length() > 0) {
-                        binding.buildRoom.setAlpha(1f);
-                        binding.buildRoom.setClickable(true);
-                    }
-                    return true;
-                }
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                String selected = adapterView.getItemAtPosition(i).toString();
+                radiusMiles = Integer.parseInt(selected.split(" ")[0]);
+                System.out.println("Selected: " + radiusMiles);
+            }
 
-                return true;
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
             }
         });
+
+        // Disable build room button
+//        binding.buildRoom.setAlpha(.4f);
+//        binding.buildRoom.setClickable(false);
+//        binding.editTextNumber.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+//            @Override
+//            public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
+//                if (i == EditorInfo.IME_ACTION_DONE) {
+//                    InputMethodManager imm = (InputMethodManager)textView.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+//                    imm.hideSoftInputFromWindow(textView.getWindowToken(), 0);
+//                    radiusMiles = Integer.parseInt(textView.getText().toString());
+//                    System.out.println(radiusMiles);
+//                    // Enable build room button
+//                    if (textView.getText().length() > 0) {
+//                        binding.buildRoom.setAlpha(1f);
+//                        binding.buildRoom.setClickable(true);
+//                    }
+//                    return true;
+//                }
+//
+//                return true;
+//            }
+//        });
 
     }
 
@@ -229,13 +255,15 @@ public class CreateRoomFragment extends Fragment {
     // Input: a page token for which page of results to pull
     // Output: a query be to sent to Google
     public String buildQuery(String pageToken) {
-        return "https://maps.googleapis.com/maps/api/place/nearbysearch/json?"
+        String query = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?"
                 + "location=" + lat + "," + lng
                 + "&radius=" + radiusMiles * 1609.34
                 + "&type=restaurant"
                 + "&pageToken=" + pageToken
                 + "&key=" + MAPS_API_KEY
                 + "\n";
+        System.out.println(query);
+        return query;
     }
 
     // Parse JSON data obtained from Google and store it into a list of restaurants
@@ -247,11 +275,11 @@ public class CreateRoomFragment extends Fragment {
 
             // Get data fields
             String name = jsonData[i].get("name").toString();
+            System.out.println(name);
             String vicinity = jsonData[i].get("vicinity").toString();
             JSONObject location = jsonData[i].getJSONObject("geometry")
                                              .getJSONObject("location");
             double latitude = (double) location.get("lat");
-            System.out.println(name);
             double longitude = (double) location.get("lat");
             String userRating = jsonData[i].get("rating").toString();
 

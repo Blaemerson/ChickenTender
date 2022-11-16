@@ -1,5 +1,7 @@
 package com.chickentender.apk;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -32,7 +34,7 @@ public class WelcomeFragment extends Fragment {
     }
 
     public void setText(String text) {
-        binding.textView.setText(text);
+//        binding.textView.setText(text);
     }
     public void goToAttract(View v)
     {
@@ -52,10 +54,16 @@ public class WelcomeFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         binding.buttonDeleteRoom.setVisibility(View.GONE);
-        binding.buttonRestaurantList.setVisibility(View.GONE);
+//        binding.buttonRestaurantList.setVisibility(View.GONE);
         binding.buttonBeginVoting.setVisibility(View.GONE);
-        binding.buttonBeginVoting.setOnClickListener(view12 -> NavHostFragment.findNavController(WelcomeFragment.this)
-                .navigate(R.id.action_WelcomeFragment_to_VotingFragment));
+        binding.buttonBeginVoting.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                VotingFragment v = VotingFragment.newInstance(((MainActivity)getActivity()).getActiveRoom().getRestaurants());
+                NavHostFragment.findNavController(WelcomeFragment.this)
+                        .navigate(R.id.action_WelcomeFragment_to_VotingFragment);
+            }
+        });
         binding.buttonJoinRoom.setOnClickListener(view12 -> NavHostFragment.findNavController(WelcomeFragment.this)
                 .navigate(R.id.action_WelcomeFragment_to_JoinRoomFragment));
         binding.buttonCreateRoom.setOnClickListener(view1 -> NavHostFragment.findNavController(WelcomeFragment.this)
@@ -63,27 +71,45 @@ public class WelcomeFragment extends Fragment {
         binding.buttonDeleteRoom.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ((MainActivity) getActivity()).deleteRoom();
-                (WelcomeFragment.this).onViewCreated(view, savedInstanceState);
+                AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
+                builder.setCancelable(true);
+                builder.setTitle("Leave this Group?");
+                builder.setMessage("If you leave this group, not be able to begin voting");
+                builder.setPositiveButton("Confirm",
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                ((MainActivity) getActivity()).deleteRoom();
+                                (WelcomeFragment.this).onViewCreated(view, savedInstanceState);
+                            }
+                        });
+                builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                });
+
+                AlertDialog dialog = builder.create();
+                dialog.show();
             }
         });
-        binding.buttonRestaurantList.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                goToAttract(view);
-            }
-        });
+//        binding.buttonRestaurantList.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                goToAttract(view);
+//            }
+//        });
 
         if (((MainActivity) getActivity()).getActiveRoom() == null) {
             binding.buttonCreateRoom.setVisibility(View.VISIBLE);
             binding.buttonJoinRoom.setVisibility(View.VISIBLE);
-            binding.textView.setText("No room active");
+//            binding.textView.setText("No room active");
         } else {
             binding.buttonCreateRoom.setVisibility(View.GONE);
             binding.buttonJoinRoom.setVisibility(View.GONE);
             binding.buttonDeleteRoom.setVisibility(View.VISIBLE);
             binding.buttonBeginVoting.setVisibility(View.VISIBLE);
-            binding.textView.setText(((MainActivity) getActivity()).getActiveRoom().getName());
+//            binding.textView.setText(((MainActivity) getActivity()).getActiveRoom().getName());
         }
     }
 

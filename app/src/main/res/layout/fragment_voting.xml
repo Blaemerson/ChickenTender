@@ -1,25 +1,59 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/voteCard"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/red2"
-    tools:context=".VotingFragment">
+    android:layout_height="250dp"
+    android:layout_margin="5dp"
+    android:layout_gravity="center"
+    android:elevation="80dp"
+    app:cardCornerRadius="4dp">
 
-    <androidx.cardview.widget.CardView
-        android:id="@+id/voteCard"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_margin="42dp"
-        android:elevation="128dp">
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_margin="8dp"
+        android:orientation="vertical">
 
+        <!--image view for course image-->
+<!--        <ImageView-->
+<!--            android:id="@+id/idRestaurantPhoto"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="200dp"-->
+<!--            android:scaleType="centerCrop" />-->
+
+        <!--text view for our course name-->
         <TextView
-            android:id="@+id/textView2"
+            android:id="@+id/idRestaurantName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="3dp"
+            android:textSize="28sp"
+            android:layout_gravity="center"
+            android:text="Restaurant Name"
+            android:textColor="@color/black" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="2">
+        </LinearLayout>
+
+        <!--text view for our course description-->
+        <TextView
+            android:id="@+id/idRestaurantLocation"
+            android:textSize="20sp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="TextView"
-            android:textSize="24dp" />
-    </androidx.cardview.widget.CardView>
+            android:layout_weight="1"
+            android:padding="3dp"
+            android:text="Location"
+            android:textColor="@color/black" />
 
-</FrameLayout>
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>
