@@ -15,12 +15,13 @@ public class Restaurant {
         this.longitude = longitude;
     }
 
-    public Restaurant(String name, String vicinity, double latitude, double longitude, String userRating) {
+    public Restaurant(String name, String vicinity, double latitude, double longitude, String userRating, String photo) {
         this.name = name;
         this.vicinity = vicinity;
         this.latitude = latitude;
         this.longitude = longitude;
         this.userRating = userRating;
+        this.photo = photo;
     }
 
     @Override

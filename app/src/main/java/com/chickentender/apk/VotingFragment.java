@@ -5,7 +5,11 @@ import android.animation.AnimatorListenerAdapter;
 import android.annotation.SuppressLint;
 import android.content.ClipData;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
+import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -13,15 +17,20 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.chickentender.apk.databinding.FragmentVotingBinding;
 import com.chickentender.apk.databinding.FragmentWelcomeBinding;
+
+import java.io.InputStream;
+import java.net.URL;
 
 import kotlinx.coroutines.Dispatchers;
 
@@ -72,6 +81,9 @@ public class VotingFragment extends Fragment {
     public void resetCard() {
         binding.idRestaurantName.setText(restaurants[restaurantIndex].getName());
         binding.idRestaurantLocation.setText(restaurants[restaurantIndex].getVicinity());
+        ImageView im = (ImageView) getView().findViewById(R.id.restaurantImg);
+        new DownloadImageTask((ImageView) im)
+                .execute(restaurants[restaurantIndex].getPhoto());
 
     }
 
@@ -85,10 +97,22 @@ public class VotingFragment extends Fragment {
 
     }
 
+    public static Drawable LoadImageFromWebOperations(String url) {
+        try {
+            InputStream is = (InputStream) new URL(url).getContent();
+            Drawable d = Drawable.createFromStream(is, "src name");
+            return d;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
         restaurants = ((MainActivity)getActivity()).getActiveRoom().getRestaurants();
+//        im.setImageDrawable(LoadImageFromWebOperations(restaurants[restaurantIndex].getPhoto()));
+        System.out.println(restaurants[restaurantIndex].getPhoto());
         votes = new int[restaurants.length];
         resetCard();
         binding.voteCard.setOnTouchListener(new View.OnTouchListener() {
@@ -155,7 +179,7 @@ public class VotingFragment extends Fragment {
                             votes[restaurantIndex] = 1;
                             Toast.makeText(view.getContext(), "Voted 'Yes'", Toast.LENGTH_SHORT).show ();
                         }
-                        restaurantIndex += 1;
+//                        restaurantIndex += 1;
                         if (restaurantIndex < restaurants.length) {
                             resetCard();
                         }
@@ -168,4 +192,29 @@ public class VotingFragment extends Fragment {
         });
 
     }
+    private static class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
+        ImageView bmImage;
+
+        public DownloadImageTask(ImageView bmImage) {
+            this.bmImage = bmImage;
+        }
+
+        protected Bitmap doInBackground(String... urls) {
+            String urldisplay = urls[0];
+            Bitmap mIcon11 = null;
+            try {
+                InputStream in = new java.net.URL(urldisplay).openStream();
+                mIcon11 = BitmapFactory.decodeStream(in);
+            } catch (Exception e) {
+                Log.e("Error", e.getMessage());
+                e.printStackTrace();
+            }
+            return mIcon11;
+        }
+
+        protected void onPostExecute(Bitmap result) {
+            bmImage.setImageBitmap(result);
+        }
+    }
+
 }

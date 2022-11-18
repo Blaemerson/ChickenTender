@@ -281,14 +281,22 @@ public class CreateRoomFragment extends Fragment {
                                              .getJSONObject("location");
             double latitude = (double) location.get("lat");
             double longitude = (double) location.get("lat");
-            String userRating = jsonData[i].get("rating").toString();
+            String userRating;
+            try {
+                userRating = jsonData[i].get("rating").toString();
+            } catch (Exception e) {
+                userRating = "";
+            }
+            String photo = "https://maps.googleapis.com/maps/api/place/photo?maxwidth=500&photo_reference=" +
+             jsonData[i].getJSONArray("photos").getJSONObject(0).get("photo_reference") + "&key=" + MAPS_API_KEY;
 
             restaurants[i] = new Restaurant(
                     name,
                     vicinity,
                     longitude,
                     latitude,
-                    userRating
+                    userRating,
+                    photo
             );
         }
         return restaurants;
