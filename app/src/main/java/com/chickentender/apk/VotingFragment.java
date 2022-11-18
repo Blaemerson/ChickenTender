@@ -82,8 +82,12 @@ public class VotingFragment extends Fragment {
         binding.idRestaurantName.setText(restaurants[restaurantIndex].getName());
         binding.idRestaurantLocation.setText(restaurants[restaurantIndex].getVicinity());
         ImageView im = (ImageView) getView().findViewById(R.id.restaurantImg);
-        new DownloadImageTask((ImageView) im)
-                .execute(restaurants[restaurantIndex].getPhoto());
+        String url = restaurants[restaurantIndex].getPhoto();
+        binding.rating.setRating(Float.valueOf(restaurants[restaurantIndex].getUserRating()));
+        if (url != "") {
+            new DownloadImageTask((ImageView) im)
+                    .execute(url);
+        }
 
     }
 
@@ -115,6 +119,26 @@ public class VotingFragment extends Fragment {
         System.out.println(restaurants[restaurantIndex].getPhoto());
         votes = new int[restaurants.length];
         resetCard();
+        binding.buttonYes.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (restaurantIndex < restaurants.length - 1) {
+                    votes[restaurantIndex] = 1;
+                    restaurantIndex += 1;
+                    resetCard();
+                }
+            }
+        });
+        binding.buttonNo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (restaurantIndex < restaurants.length - 1) {
+                    votes[restaurantIndex] = -1;
+                    restaurantIndex += 1;
+                    resetCard();
+                }
+            }
+        });
         binding.voteCard.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
@@ -127,65 +151,6 @@ public class VotingFragment extends Fragment {
                 // ... Respond to touch events
                 switch(motionEvent.getAction())
                 {
-
-                    case MotionEvent.ACTION_DOWN:
-                        x1 = motionEvent.getX();
-                        y1 = motionEvent.getY();
-                        return true;
-                    case MotionEvent.ACTION_UP:
-                        x2 = motionEvent.getX();
-                        float deltaX = x2 - x1;
-                        y2 = motionEvent.getY();
-                        float deltaY = y2 - y1;
-                        System.out.println("Hello");
-                        if (deltaY < -150) { // or newX < cardStart + cardHeight
-                            binding.voteCard.animate().y(
-                                            Math.min(cardStart - cardHeight, y2 - (cardHeight / 2))
-                                    )
-                                    .setDuration(400)
-                                    .start();
-                            System.out.println("down to up");
-                            votes[restaurantIndex] = 0;
-                            Toast.makeText(view.getContext(), "Voted 'I don't care'", Toast.LENGTH_SHORT).show ();
-                        }
-                        else if (deltaY > 150) { // or newX < cardStart + cardHeight
-                            binding.voteCard.animate().y(
-                                        2000
-                                    )
-                                    .setDuration(400)
-                                    .start();
-                            System.out.println("up to down");
-                            votes[restaurantIndex] = -2;
-                            Toast.makeText(view.getContext(), "Voted 'Hard Pass'", Toast.LENGTH_SHORT).show ();
-                        }
-                        else if (deltaX < -150) { // or newX < cardStart + cardWidth
-                            binding.voteCard.animate().x(
-                                      Math.min(cardStart - cardWidth, x2 - (cardWidth / 2))
-                                    )
-                                    .setDuration(400)
-                                    .start();
-                            binding.voteCard.animate().setStartDelay(400).translationX(0).setDuration(300).start();
-                            System.out.println("right to left");
-                            votes[restaurantIndex] = -1;
-                            Toast.makeText(view.getContext(), "Voted 'No'", Toast.LENGTH_SHORT).show ();
-                        }
-                        else if (deltaX > 150) {
-                            binding.voteCard.animate().x(
-                                            Math.min(cardStart + cardWidth, x2 + (cardWidth / 2))
-                                    )
-                                    .setDuration(400)
-                                    .start();
-                            System.out.println("left to right");
-                            votes[restaurantIndex] = 1;
-                            Toast.makeText(view.getContext(), "Voted 'Yes'", Toast.LENGTH_SHORT).show ();
-                        }
-//                        restaurantIndex += 1;
-                        if (restaurantIndex < restaurants.length) {
-                            resetCard();
-                        }
-                        else {
-                        }
-                        break;
                 }
                 return false;
             }

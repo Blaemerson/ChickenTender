@@ -282,13 +282,19 @@ public class CreateRoomFragment extends Fragment {
             double latitude = (double) location.get("lat");
             double longitude = (double) location.get("lat");
             String userRating;
+
+            String photo;
             try {
                 userRating = jsonData[i].get("rating").toString();
             } catch (Exception e) {
                 userRating = "";
             }
-            String photo = "https://maps.googleapis.com/maps/api/place/photo?maxwidth=500&photo_reference=" +
-             jsonData[i].getJSONArray("photos").getJSONObject(0).get("photo_reference") + "&key=" + MAPS_API_KEY;
+            try {
+                photo = "https://maps.googleapis.com/maps/api/place/photo?maxwidth=1000&photo_reference=" +
+                        jsonData[i].getJSONArray("photos").getJSONObject(0).get("photo_reference") + "&key=" + MAPS_API_KEY;
+            } catch (Exception e) {
+                photo = "";
+            }
 
             restaurants[i] = new Restaurant(
                     name,
@@ -315,34 +321,47 @@ public class CreateRoomFragment extends Fragment {
         // Create the HTTP Connection
         // Input: a query to be sent to Google Places API
         // Output: an array of Places as JSONObjects
-        public JSONObject[] request(String query) {
+        public JSONObject[] request() {
+            int i = 0;
+            String nextPageToken = "";
+            String query = buildQuery(nextPageToken);
             JSONObject[] places = null;
-            OkHttpClient client = new OkHttpClient().newBuilder()
-                    .build();
-            MediaType mediaType = MediaType.parse("text/plain");
-            RequestBody body = FormBody.create(mediaType, "");
-            Request request = new Request.Builder()
-                    .url(query)
-                    .addHeader("Accept", "application/json")
-                    .method("GET", null)
-                    .build();
-            try {
-                Response response = client.newCall(request).execute();
-                String jsonData = response.body().string();
-                JSONObject Jobject = new JSONObject(jsonData);
-                JSONArray Jarray = Jobject.getJSONArray("results");
-                places = new JSONObject[Jarray.length()];
+            while (true) {
+                OkHttpClient client = new OkHttpClient().newBuilder()
+                        .build();
+                MediaType mediaType = MediaType.parse("text/plain");
+                RequestBody body = FormBody.create(mediaType, "");
+                Request request = new Request.Builder()
+                        .url(query)
+                        .addHeader("Accept", "application/json")
+                        .method("GET", null)
+                        .build();
+                try {
+                    Response response = client.newCall(request).execute();
+                    String jsonData = response.body().string();
+                    JSONObject Jobject = new JSONObject(jsonData);
+                    JSONArray Jarray = Jobject.getJSONArray("results");
+                    places = new JSONObject[Jarray.length()];
 
-                for (int i = 0; i < Jarray.length(); i++) {
-                    JSONObject object     = Jarray.getJSONObject(i);
+                    for (; i < Jarray.length(); i++) {
+                        JSONObject object     = Jarray.getJSONObject(i);
 
-                    places[i] = object;
+                        places[i] = object;
 //                    System.out.println(places[i]) + " @ " + places[i].get("vicinity"));
-                    System.out.println(places[i]);
+                        System.out.println(places[i]);
+                    }
+                    nextPageToken = Jobject.get("next_page_token").toString();
+                    if (nextPageToken == "") {
+                        break;
+                    } else {
+                        break;
+//                        query = buildQuery(nextPageToken);
+                    }
+                }  catch (JSONException | IOException e) {
+                    e.printStackTrace();
                 }
-            }  catch (JSONException | IOException e) {
-                e.printStackTrace();
             }
+            System.out.println("IT WORKED" + places.length);
             return places;
         }
 
@@ -350,7 +369,7 @@ public class CreateRoomFragment extends Fragment {
         // Output: an list of JSON objects
         @Override
         protected JSONObject[] doInBackground(String... params) {
-            JSONObject[] places = request(buildQuery(""));
+            JSONObject[] places = request();
             return places;
         }
 
