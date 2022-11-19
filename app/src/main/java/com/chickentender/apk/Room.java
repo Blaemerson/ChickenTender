@@ -1,12 +1,14 @@
 package com.chickentender.apk;
 
+import java.util.List;
+
 // This class holds all data and methods related to a room.
 // A room is created through the CreateRoomFragment.
 public class Room
 {
     private String name;
     // To connect to the host who set up the room.
-    private String hostIP;
+    private String hostID;
     private String[] IPs;
     // Radius (in meters or miles) from which to pull restaurants.
     private double radius;
@@ -14,16 +16,13 @@ public class Room
     private double latitude;
     private double longtitude;
     // To store restaurants that were collected during room creation.
-    private Restaurant[] restaurants;
+    private List<Restaurant> restaurants;
 
     // Constructor
-    public Room(String name, Restaurant[] restaurants, String hostIP, double radius, double latitude, double longitude)
+    public Room(String name, List<Restaurant> restaurants, List<String> members, String hostID)
     {
         this.name = name;
-        this.hostIP = hostIP;
-        this.radius = radius;
-        this.latitude = latitude;
-        this.longtitude = longitude;
+        this.hostID = hostID;
         this.restaurants= restaurants;
     }
 
@@ -32,11 +31,11 @@ public class Room
         return name;
     }
 
-    public void setRestaurants(Restaurant[] restaurants)
+    public void setRestaurants(List<Restaurant> restaurants)
     {
         this.restaurants = restaurants;
     }
-    public Restaurant[] getRestaurants()
+    public List<Restaurant> getRestaurants()
     {
         return restaurants;
     }
@@ -44,12 +43,6 @@ public class Room
     // Method to add a single restaurant to the list.
     public void addRestaurant(Restaurant restaurant)
     {
-        Restaurant[] updated = new Restaurant[restaurants.length + 1];
-        for (int i = 0; i < restaurants.length; i++)
-        {
-            updated[i] = restaurants[i];
-        }
-        updated[updated.length] = restaurant;
-        setRestaurants(updated);
+        restaurants.add(restaurant);
     }
 }

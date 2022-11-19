@@ -25,10 +25,11 @@ import com.chickentender.apk.databinding.FragmentVotingBinding;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.List;
 
 public class VotingFragment extends Fragment {
 
-    private static Restaurant[] restaurants;
+    private static List<Restaurant> restaurants;
     private static Restaurant currentOp;
     private int index = 0;
     private static HashMap<Restaurant, Integer> votingResults;
@@ -46,7 +47,7 @@ public class VotingFragment extends Fragment {
      * @return A new instance of fragment VotingFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static VotingFragment newInstance(Restaurant[] restaurants) {
+    public static VotingFragment newInstance(List<Restaurant> restaurants) {
         VotingFragment fragment = new VotingFragment();
         Bundle args = new Bundle();
         fragment.setArguments(args);
@@ -62,18 +63,19 @@ public class VotingFragment extends Fragment {
 
     public void registerVote(int vote)
     {
-        if (index < restaurants.length - 1)
+        if (index < restaurants.size() - 1)
         {
             votingResults.put(currentOp, vote);
             System.out.println("Vote: " + currentOp.getName() + " = " + votingResults.get(currentOp));
             index++;
             resetCard();
+
         }
     }
 
     public void resetCard()
     {
-        currentOp = restaurants[index];
+        currentOp = restaurants.get(index);
         binding.idRestaurantName.setText(currentOp.getName());
         binding.idRestaurantLocation.setText(currentOp.getVicinity());
         binding.rating.setRating(Float.parseFloat(currentOp.getUserRating()));
@@ -114,7 +116,7 @@ public class VotingFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         restaurants = ((MainActivity)getActivity()).getActiveRoom().getRestaurants();
-        System.out.println(restaurants[index].getPhoto());
+//        System.out.println(restaurants.get(index).getPhoto());
         votingResults = new HashMap<>();
         resetCard();
         binding.buttonYes.setOnClickListener(new View.OnClickListener()

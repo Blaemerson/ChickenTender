@@ -87,7 +87,10 @@ public class JoinRoomFragment extends Fragment
                 @Override
                 public void onClick(View view)
                 {
+                    ((MainActivity) getActivity()).joinRoom(binding.editTextRoomID.getText().toString());
                     Toast.makeText(view.getContext(), "Joined Room", Toast.LENGTH_LONG).show();
+//                    NavHostFragment.findNavController(JoinRoomFragment.this)
+//                            .navigate(R.id.action_backFromJoinRoomScreen);
                     // TODO: get room from server
                 }
             }

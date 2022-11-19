@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "826928863878",
+    "project_id": "chicken-tender-363916",
+    "storage_bucket": "chicken-tender-363916.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:826928863878:android:0d7fe0cb2803cec93a8f07",
+        "android_client_info": {
+          "package_name": "com.chickentender.apk"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "826928863878-916bu84e4qhlbkvtfbssih1s0k8ha51v.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCCw-q2RAr1qCh4CUBIt8JDOfTDGLWzKRw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "826928863878-916bu84e4qhlbkvtfbssih1s0k8ha51v.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
