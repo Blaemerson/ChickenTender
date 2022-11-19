@@ -340,7 +340,6 @@ public class CreateRoomFragment extends Fragment {
             String query = buildQuery(nextPageToken);
             JSONObject[] places = null;
             int i = 0;
-            while (true) {
                 OkHttpClient client = new OkHttpClient().newBuilder()
                         .build();
                 MediaType mediaType = MediaType.parse("text/plain");
@@ -369,18 +368,15 @@ public class CreateRoomFragment extends Fragment {
                     if (nextPageToken == "")
                     {
                         // TODO: Implement next page fetch
-                        break;
                     }
                     else
                     {
-                        break;
                     }
                 }
                 catch (JSONException | IOException e)
                 {
                     e.printStackTrace();
                 }
-            }
             return places;
         }
 

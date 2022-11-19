@@ -27,6 +27,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -129,6 +130,32 @@ public class MainActivity extends AppCompatActivity {
     }
     public void deleteRoom()
     {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        Query query = db.collection("rooms").whereEqualTo("id", activeRoom.getName());
+        query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        Log.d("TAG",
+                                "Document Id: " + document.getId());
+                        document.getReference().delete();
+                    }
+                }
+        }
+    });
+        db.collection("rooms").document(activeRoom.getName()).delete().addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if (task.isSuccessful()) {
+                    Toast.makeText(MainActivity.this, "Room has been deleted.", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(MainActivity.this, "Room has been deleted.", Toast.LENGTH_SHORT).show();
+                }
+
+            }
+        });
+
         this.activeRoom = null;
     }
     public Room getActiveRoom()
