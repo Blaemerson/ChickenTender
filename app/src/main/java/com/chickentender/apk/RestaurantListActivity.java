@@ -14,24 +14,25 @@ import com.chickentender.apk.databinding.ActivityRestaurantListBinding;
 
 import java.util.ArrayList;
 
-public class RestaurantListActivity extends ListActivity {
-    ArrayList<String> listItems=new ArrayList<String>();
+public class RestaurantListActivity extends ListActivity
+{
+    ArrayList<String> listItems= new ArrayList<>();
     private ActivityRestaurantListBinding binding;
     //DEFINING A STRING ADAPTER WHICH WILL HANDLE THE DATA OF THE LISTVIEW
     ArrayAdapter<String> adapter;
 
-    private void fillList() {
+    private void fillList()
+    {
         Intent intent = getIntent();
         Bundle bundle = intent.getExtras();
         adapter.addAll(bundle.getStringArrayList("listview"));
     }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
-        adapter=new ArrayAdapter<String>(this,
-                android.R.layout.simple_list_item_1,
-                listItems);
+        adapter=new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, listItems);
         setListAdapter(adapter);
         fillList();
 

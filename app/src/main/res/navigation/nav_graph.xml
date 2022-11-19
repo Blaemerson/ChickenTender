@@ -30,7 +30,7 @@
         tools:layout="@layout/fragment_create_room">
 
         <action
-            android:id="@+id/action_SecondFragment_to_FirstFragment"
+            android:id="@+id/action_returnFromCreateRoom"
             app:destination="@id/FirstFragment" />
     </fragment>
     <fragment
@@ -40,7 +40,7 @@
         tools:layout="@layout/fragment_join_room">
 
         <action
-            android:id="@+id/action_ThirdFragment_to_FirstFragment"
+            android:id="@+id/action_backFromJoinRoomScreen"
             app:destination="@id/FirstFragment" />
     </fragment>
 
