@@ -78,7 +78,14 @@ public class VotingFragment extends Fragment {
         currentOp = restaurants.get(index);
         binding.idRestaurantName.setText(currentOp.getName());
         binding.idRestaurantLocation.setText(currentOp.getVicinity());
-        binding.rating.setRating(Float.parseFloat(currentOp.getUserRating()));
+        if (currentOp.getUserRating() != "")
+        {
+            binding.rating.setRating(Float.parseFloat(currentOp.getUserRating()));
+        }
+        else
+        {
+            binding.rating.setRating(0);
+        }
         String url = currentOp.getPhoto();
         if (url != "")
         {
