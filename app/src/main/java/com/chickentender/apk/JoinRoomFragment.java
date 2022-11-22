@@ -18,6 +18,8 @@ import android.widget.Toast;
 
 import com.chickentender.apk.databinding.FragmentJoinRoomBinding;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link JoinRoomFragment#newInstance} factory method to
@@ -88,9 +90,19 @@ public class JoinRoomFragment extends Fragment
                 public void onClick(View view)
                 {
                     ((MainActivity) getActivity()).joinRoom(binding.editTextRoomID.getText().toString());
-                    Toast.makeText(view.getContext(), "Joined Room", Toast.LENGTH_LONG).show();
-//                    NavHostFragment.findNavController(JoinRoomFragment.this)
-//                            .navigate(R.id.action_backFromJoinRoomScreen);
+
+                    if (((MainActivity) getActivity()).getActiveRoom() != null)
+                    {
+                        Toast.makeText(getContext(), "Joined Room", Toast.LENGTH_SHORT).show();
+                        NavHostFragment.findNavController(JoinRoomFragment.this)
+                                .navigate(R.id.action_Join_to_WaitingRoom);
+
+                    }
+                    else
+                    {
+                        Toast.makeText(getContext(), "Failed to Find Room", Toast.LENGTH_SHORT).show();
+                    }
+
                     // TODO: get room from server
                 }
             }

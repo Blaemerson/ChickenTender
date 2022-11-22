@@ -11,6 +11,8 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -29,6 +31,7 @@ import java.util.List;
 
 public class VotingFragment extends Fragment {
 
+    private RecyclerView recyclerView;
     private static List<Restaurant> restaurants;
     private static Restaurant currentOp;
     private int index = 0;
@@ -73,11 +76,16 @@ public class VotingFragment extends Fragment {
         }
     }
 
+    public void showNextCard()
+    {
+    }
+
     public void resetCard()
     {
         currentOp = restaurants.get(index);
         binding.idRestaurantName.setText(currentOp.getName());
         binding.idRestaurantLocation.setText(currentOp.getVicinity());
+
         if (currentOp.getUserRating() != "")
         {
             binding.rating.setRating(Float.parseFloat(currentOp.getUserRating()));
@@ -91,6 +99,10 @@ public class VotingFragment extends Fragment {
         {
             ImageView im = getView().findViewById(R.id.restaurantImg);
             new DownloadImageTask(im).execute(url);
+        }
+        else
+        {
+            binding.restaurantImg.setImageResource(R.drawable.no_image_available);
         }
 
     }
@@ -126,6 +138,7 @@ public class VotingFragment extends Fragment {
 //        System.out.println(restaurants.get(index).getPhoto());
         votingResults = new HashMap<>();
         resetCard();
+
         binding.buttonYes.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -172,7 +185,9 @@ public class VotingFragment extends Fragment {
 
         protected void onPostExecute(Bitmap result)
         {
-            bmImage.setImageBitmap(result);
+
+                System.out.println("Here2");
+                bmImage.setImageBitmap(result);
         }
     }
 
