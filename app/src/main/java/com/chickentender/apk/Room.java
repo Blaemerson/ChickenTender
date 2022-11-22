@@ -6,10 +6,10 @@ import java.util.List;
 // A room is created through the CreateRoomFragment.
 public class Room
 {
-    private String name;
+    private String roomID;
     // To connect to the host who set up the room.
     private String hostID;
-    private String[] IPs;
+    private List<String> members;
     // Radius (in meters or miles) from which to pull restaurants.
     private double radius;
     // Location broken up into longitude and latitude.
@@ -21,14 +21,15 @@ public class Room
     // Constructor
     public Room(String name, List<Restaurant> restaurants, List<String> members, String hostID)
     {
-        this.name = name;
+        this.roomID = name;
         this.hostID = hostID;
+        this.members = members;
         this.restaurants= restaurants;
     }
 
-    public String getName()
+    public String getRoomID()
     {
-        return name;
+        return roomID;
     }
 
     public void setRestaurants(List<Restaurant> restaurants)
@@ -40,6 +41,12 @@ public class Room
         return restaurants;
     }
 
+    public void setMembers(List<String> members) {
+        this.members = members;
+    }
+    public List<String> getMembers() {
+        return this.members;
+    }
     // Method to add a single restaurant to the list.
     public void addRestaurant(Restaurant restaurant)
     {

@@ -1,12 +1,10 @@
 package com.chickentender.apk;
 
-import android.app.Fragment;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import androidx.fragment.app.FragmentTransaction;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
@@ -16,10 +14,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -55,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
 
     public boolean joinRoom(String id)
     {
+        boolean success = false;
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         Query query = db.collection("rooms").whereEqualTo("id", id);
         query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -81,25 +77,26 @@ public class MainActivity extends AppCompatActivity {
                             );
                         }
                         List<String> users = (List<String>) document.get("users");
+                        userID = getRandomHexString(6);
+                        users.add(userID);
                         activeRoom = new Room(
                                 document.get("id", String.class),
                                 r,
                                 users,
                                 document.get("hostID", String.class)
                         );
+                        db.collection("rooms").document(document.getId()).update("users", users);
                     }
                 }
             }
         });
-        // Reload current fragment
-//        db.collection("rooms")
-//                .whereEqualTo("roomID", id).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-//                    @Override
-//                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-//                        Log.d("yes", "Successful query");
-//                    }
-//                });
-        return true;
+
+
+        if (activeRoom != null) {
+            success = true;
+        }
+
+        return success;
     }
     public void createRoom(String name, Restaurant[] restaurants, double radius, double lat, double lng)
     {
@@ -131,20 +128,33 @@ public class MainActivity extends AppCompatActivity {
     public void deleteRoom()
     {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        Query query = db.collection("rooms").whereEqualTo("id", activeRoom.getName());
+        Query query = db.collection("rooms").whereEqualTo("id", activeRoom.getRoomID());
         query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
-                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        for (QueryDocumentSnapshot document : task.getResult())
+                        {
+                            List<String> users = (List<String>) document.get("users");
+                            if (users.contains(userID))
+                            {
+                                users.remove(userID);
+                                db.collection("rooms").document(document.getId()).update("users", users);
+                            }
+                            if (document.get("hostID") == userID)
+                            {
+                                document.getReference().delete();
+                            }
+                        }
+
+                            for (QueryDocumentSnapshot document : task.getResult()) {
                         Log.d("TAG",
                                 "Document Id: " + document.getId());
-                        document.getReference().delete();
                     }
                 }
         }
     });
-        db.collection("rooms").document(activeRoom.getName()).delete().addOnCompleteListener(new OnCompleteListener<Void>() {
+        db.collection("rooms").document(activeRoom.getRoomID()).delete().addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 if (task.isSuccessful()) {

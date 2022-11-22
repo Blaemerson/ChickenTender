@@ -40,6 +40,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 import okhttp3.FormBody;
 import okhttp3.MediaType;
@@ -248,9 +249,20 @@ public class CreateRoomFragment extends Fragment {
 
             ((MainActivity) getActivity()).createRoom(roomName, restaurants, radiusMiles, lat, lng);
 
-            Toast.makeText(this.getContext(), "Room Created", Toast.LENGTH_SHORT).show();
-            NavHostFragment.findNavController(CreateRoomFragment.this)
-                    .navigate(R.id.action_returnFromCreateRoom);
+            if (((MainActivity) getActivity()).getActiveRoom() != null)
+            {
+                Toast.makeText(this.getContext(), "Room Created", Toast.LENGTH_SHORT).show();
+                NavHostFragment.findNavController(CreateRoomFragment.this)
+                        .navigate(R.id.action_Create_to_WaitingRoom);
+
+            }
+            else
+            {
+                Toast.makeText(this.getContext(), "Room Creation Failed", Toast.LENGTH_SHORT).show();
+            }
+
+
+
         }
         else
         {
