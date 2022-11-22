@@ -3,6 +3,7 @@ package com.chickentender.apk;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import androidx.navigation.NavController;
@@ -14,11 +15,16 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.Source;
 
+import android.provider.Settings;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -53,6 +59,8 @@ public class MainActivity extends AppCompatActivity {
         boolean success = false;
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         Query query = db.collection("rooms").whereEqualTo("id", id);
+        userID = Settings.Secure.getString(this.getContentResolver(),
+                Settings.Secure.ANDROID_ID);
         query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
@@ -61,6 +69,7 @@ public class MainActivity extends AppCompatActivity {
                         Log.d("TAG",
                                 "Document Id: " + document.getId());
 
+
                         List<HashMap<String, Object>> rs = (List<HashMap<String, Object>>) document.get("restaurants");
 
                         List<Restaurant> r = new ArrayList<>();
@@ -68,6 +77,7 @@ public class MainActivity extends AppCompatActivity {
                         for (int i = 0; i < rs.size(); i++) {
                             r.add(new Restaurant(
                                     rs.get(i).get("name").toString(),
+                                    rs.get(i).get("id").toString(),
                                     rs.get(i).get("vicinity").toString(),
                                     (double) rs.get(i).get("latitude"),
                                     (double) rs.get(i).get("longitude"),
@@ -77,15 +87,19 @@ public class MainActivity extends AppCompatActivity {
                             );
                         }
                         List<String> users = (List<String>) document.get("users");
-                        userID = getRandomHexString(6);
-                        users.add(userID);
+
+                        // Only update database if user has not already joined
+                        if (!users.contains(userID))
+                        {
+                            users.add(userID);
+                            db.collection("rooms").document(document.getId()).update("users", users);
+                        }
                         activeRoom = new Room(
                                 document.get("id", String.class),
                                 r,
                                 users,
                                 document.get("hostID", String.class)
                         );
-                        db.collection("rooms").document(document.getId()).update("users", users);
                     }
                 }
             }
@@ -101,20 +115,34 @@ public class MainActivity extends AppCompatActivity {
     public void createRoom(String name, Restaurant[] restaurants, double radius, double lat, double lng)
     {
         Map<String, Object> room = new HashMap<>();
+        Map<String, Object> user = new HashMap<>();
         List<String> userIDs = new ArrayList<>();
-        userID = getRandomHexString(6);
+        userID = Settings.Secure.getString(this.getContentResolver(),
+                Settings.Secure.ANDROID_ID);
         userIDs.add(userID);
         roomID = getRandomHexString(6);
+        user.put("active_room", roomID);
+
         room.put("id", roomID);
         room.put("users", userIDs);
         room.put("hostID", userID);
         room.put("restaurants", Arrays.asList(restaurants));
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("rooms").add(room).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+
+        db.collection("users").document(userID).set(user).addOnSuccessListener(new OnSuccessListener() {
             @Override
-            public void onSuccess(DocumentReference documentReference) {
-                Log.d("yes", "DocumentSnapshot added with ID: " + documentReference.getId());
+            public void onSuccess(Object o) {
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.w("yes", "Error adding document", e);
+            }
+        });
+        db.collection("rooms").document(roomID).set(room).addOnSuccessListener(new OnSuccessListener() {
+            @Override
+            public void onSuccess(Object o) {
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
@@ -129,6 +157,7 @@ public class MainActivity extends AppCompatActivity {
     {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         Query query = db.collection("rooms").whereEqualTo("id", activeRoom.getRoomID());
+
         query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {

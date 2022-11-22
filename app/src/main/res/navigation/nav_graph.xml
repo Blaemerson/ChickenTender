@@ -65,7 +65,7 @@
 
     <fragment
         android:id="@+id/WaitingRoom"
-        android:name="com.chickentender.apk.WaitingRoom"
+        android:name="com.chickentender.apk.WaitingRoomFragment"
         android:label="Waiting"
         tools:layout="@layout/fragment_waiting_room">
         <action

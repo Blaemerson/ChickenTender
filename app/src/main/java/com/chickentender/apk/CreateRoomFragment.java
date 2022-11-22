@@ -302,6 +302,7 @@ public class CreateRoomFragment extends Fragment {
                                              .getJSONObject("location");
             double latitude = (double) location.get("lat");
             double longitude = (double) location.get("lat");
+            String id = jsonData[i].get("place_id").toString();
             String userRating;
 
             String photo;
@@ -319,7 +320,7 @@ public class CreateRoomFragment extends Fragment {
                                              .getJSONObject(0).get("photo_reference")
                                              .toString();
                 String url = "https://maps.googleapis.com/maps/api/place/photo?";
-                String params = "maxwidth=900&photo_reference=" + photoRef + "&key=" + MAPS_API_KEY;
+                String params = "maxwidth=750&photo_reference=" + photoRef + "&key=" + MAPS_API_KEY;
                 photo = url + params;
             }
             catch (Exception e)
@@ -327,7 +328,7 @@ public class CreateRoomFragment extends Fragment {
                 photo = "";
             }
 
-            restaurants[i] = new Restaurant(name, vicinity, longitude, latitude, userRating, photo);
+            restaurants[i] = new Restaurant(name, id, vicinity, longitude, latitude, userRating, photo);
         }
         return restaurants;
     }
