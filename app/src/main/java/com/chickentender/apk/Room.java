@@ -1,10 +1,11 @@
 package com.chickentender.apk;
 
+import java.io.Serializable;
 import java.util.List;
 
 // This class holds all data and methods related to a room.
 // A room is created through the CreateRoomFragment.
-public class Room
+public class Room implements Serializable
 {
     private String roomID;
     // To connect to the host who set up the room.

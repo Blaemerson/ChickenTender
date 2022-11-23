@@ -9,66 +9,81 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-            <androidx.cardview.widget.CardView
+        <androidx.cardview.widget.CardView
 
-                android:id="@+id/roomInfoCard"
+            android:id="@+id/roomInfoCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginLeft="100dp"
+            android:layout_marginTop="50dp"
+            android:layout_marginRight="100dp"
+            android:layout_marginBottom="100dp"
+            android:elevation="80dp">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="50dp"
-                android:layout_marginLeft="100dp"
-                android:layout_marginRight="100dp"
-                android:layout_gravity="center"
-                android:layout_marginBottom="100dp"
-                android:elevation="80dp">
+                android:layout_height="match_parent"
+                android:layout_gravity="center_horizontal">
 
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_gravity="center_horizontal">
+                <TextView
+                    android:id="@+id/roomID"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_weight="1"
+                    android:text="TextView"
+                    android:textSize="42sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
-                    <TextView
-                        android:id="@+id/roomID"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_horizontal"
-                        android:layout_weight="1"
-                        android:text="TextView"
-                        android:textSize="42sp"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
+                <TextView
+                    android:id="@+id/textView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:layout_weight="1"
+                    android:text="TextView"
+                    android:textSize="32sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/roomID" />
 
-                    <TextView
-                        android:id="@+id/textView"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="20dp"
-                        android:layout_weight="1"
-                        android:textSize="32sp"
-                        android:text="TextView"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/roomID" />
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
 
-            </androidx.cardview.widget.CardView>
-
+        </androidx.cardview.widget.CardView>
 
 
         <Button
             android:id="@+id/button"
             android:layout_width="wrap_content"
-            android:layout_marginTop="300dp"
-            android:layout_marginLeft="100dp"
-            android:layout_marginRight="100dp"
-            android:layout_marginBottom="300dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
+            android:layout_marginLeft="80dp"
+            android:layout_marginTop="300dp"
+            android:layout_marginRight="80dp"
+            android:layout_marginBottom="50dp"
             android:layout_weight="1"
-            android:textSize="30sp"
-            android:text="Start Voting" />
+            android:text="Start Voting"
+            android:textSize="30sp" />
+
+        <Button
+            android:id="@+id/button_delete_room"
+            android:layout_width="220dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/button"
+            android:layout_marginStart="100dp"
+            android:layout_marginTop="0dp"
+            android:layout_marginEnd="100dp"
+            android:layout_marginBottom="200dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:text="Leave Group"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textSize="30sp" />
+
 
     </RelativeLayout>
 

@@ -40,7 +40,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.concurrent.TimeUnit;
 
 import okhttp3.FormBody;
 import okhttp3.MediaType;
@@ -247,7 +246,7 @@ public class CreateRoomFragment extends Fragment {
         {
             roomName = "Room1: Restaurants: " + restaurants.length;
 
-            ((MainActivity) getActivity()).createRoom(roomName, restaurants, radiusMiles, lat, lng);
+            ((MainActivity) getActivity()).createRoom(restaurants);
 
             if (((MainActivity) getActivity()).getActiveRoom() != null)
             {

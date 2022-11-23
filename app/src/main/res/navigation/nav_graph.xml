@@ -10,7 +10,9 @@
         android:name="com.chickentender.apk.WelcomeFragment"
         android:label="@string/first_fragment_label"
         tools:layout="@layout/fragment_welcome">
-
+        <action
+            android:id="@+id/action_Welcome_to_WaitingRoom"
+            app:destination="@id/WaitingRoom" />
         <action
             android:id="@+id/action_WelcomeFragment_to_CreateRoomFragment"
             app:destination="@id/SecondFragment" />
@@ -71,6 +73,9 @@
         <action
             android:id="@+id/action_Waiting_to_VotingFragment"
             app:destination="@id/VotingFragment" />
+        <action
+            android:id="@+id/action_Waiting_to_WelcomeFragment"
+            app:destination="@id/FirstFragment" />
 
     </fragment>
 
