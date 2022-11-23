@@ -2,43 +2,64 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/frameLayout2"
+    android:id="@+id/joinRoomFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".JoinRoomFragment">
 
 
-    <EditText
-        android:id="@+id/editTextRoomID"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:ems="10"
-        android:gravity="center"
-        android:hint="Room ID"
-        android:imeOptions="actionDone"
-        android:inputType="text"
-        android:textSize="30sp"
+    <androidx.cardview.widget.CardView
+        android:layout_width="280dp"
+        android:layout_height="75dp"
+        app:cardCornerRadius="30dp"
+        android:id="@+id/idCard"
         app:layout_constraintBottom_toTopOf="@id/button_back"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent" >
+        <EditText
+            android:id="@+id/editTextRoomID"
+            android:layout_width="280dp"
+            android:layout_height="75dp"
+            android:layout_gravity="center_horizontal"
+            android:background="@color/quantum_white_100"
+            android:maxLength="6"
+            android:elevation="0dp"
+            android:ems="10"
+            android:foregroundGravity="center"
+            android:gravity="center"
+            android:textColor="@color/quantum_grey900"
+            android:fontFamily="sans-serif-black"
+            android:hint="Room ID"
+            android:imeOptions="actionDone"
+            android:inputType="textCapCharacters"
+            android:padding="5dp"
+            android:textSize="30sp"/>
 
-    <Button
+
+
+</androidx.cardview.widget.CardView>
+
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/button_room_search"
-        android:layout_width="wrap_content"
+        android:layout_width="285dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center|center_horizontal"
         android:layout_margin="16dp"
         android:text="Find Room"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:textColor="@color/quantum_white_100"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        android:scaleX="2"
-        android:scaleY="2"
-        app:layout_constraintTop_toBottomOf="@id/editTextRoomID" />
+        android:background="@drawable/round_button_green"
+        android:fontFamily="sans-serif-black"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        android:textSize="30sp"
+
+        app:layout_constraintTop_toBottomOf="@id/idCard" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/button_back"

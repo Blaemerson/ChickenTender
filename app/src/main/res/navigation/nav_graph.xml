@@ -61,8 +61,8 @@
         tools:layout="@layout/fragment_voting">
 
         <action
-            android:id="@+id/action_WelcomeFragment_to_VotingFragment"
-            app:destination="@id/VotingFragment" />
+            android:id="@+id/action_FinishedVoting"
+            app:destination="@id/FirstFragment" />
     </fragment>
 
     <fragment

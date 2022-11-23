@@ -17,6 +17,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -100,13 +101,13 @@ public class VotingFragment extends Fragment {
 
     public void registerVote(int vote)
     {
-        if (index < restaurants.size() - 1)
+        if (restaurants.indexOf(currentOp) < restaurants.size() - 1)
         {
             votingResults.put(currentOp, vote);
             System.out.println("Vote: " + currentOp.getName() + " = " + votingResults.get(currentOp));
             index++;
-
         }
+
     }
 
     public void showNextCard()
@@ -126,7 +127,11 @@ public class VotingFragment extends Fragment {
 
             }
         }).start();
-        resetCard();
+        if (index >= restaurants.size() - 1) {
+            NavHostFragment.findNavController(VotingFragment.this).navigate(R.id.action_FinishedVoting);
+        } else {
+            resetCard();
+        }
     }
 
     public void resetCard()
@@ -136,7 +141,13 @@ public class VotingFragment extends Fragment {
         currentOp = restaurants.get(index);
         binding.idRestaurantName.setText(currentOp.getName());
         binding.idRestaurantLocation.setText(currentOp.getVicinity());
-        new DownloadImageTask(binding.restaurantImg).execute(currentOp.getPhoto());
+
+        if (currentOp.getPhoto() == "") {
+            binding.restaurantImg.setImageResource(R.drawable.no_image_available);
+        }
+        else {
+            new DownloadImageTask(binding.restaurantImg).execute(currentOp.getPhoto());
+        }
 
         if (currentOp.getUserRating() != "")
         {
@@ -148,7 +159,6 @@ public class VotingFragment extends Fragment {
         }
 //        binding.restaurantImg.setImageBitmap(imageMap.get(currentOp.getName()));
         binding.voteCard.setClickable(true);
-
     }
 
     @Override

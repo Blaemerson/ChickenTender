@@ -9,40 +9,43 @@
     tools:context=".WelcomeFragment">
 
 
-
-
-
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/button_join_room"
-        android:layout_width="230dp"
+        android:layout_width="285dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="100dp"
         android:layout_marginTop="5dp"
         android:layout_marginEnd="100dp"
         android:layout_marginBottom="300dp"
+        android:fontFamily="sans-serif-black"
+        android:textColor="@color/quantum_white_100"
         android:paddingTop="10dp"
         android:paddingBottom="10dp"
-        android:text="@string/join"
-        android:textSize="32sp"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:textSize="32sp"
+        android:background="@drawable/round_button_green"
+        android:text="@string/join"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/button_create_room" />
 
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/button_create_room"
-        android:layout_width="230dp"
+        android:layout_width="285dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="100dp"
         android:layout_marginTop="300dp"
         android:layout_marginEnd="100dp"
         android:layout_marginBottom="5dp"
+        android:fontFamily="sans-serif-black"
+        android:textColor="@color/quantum_white_100"
         android:paddingTop="10dp"
         android:paddingBottom="10dp"
-        android:text="@string/create"
-        android:textSize="32sp"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:textSize="32sp"
+        android:background="@drawable/round_button_green"
+        android:text="@string/create"
         app:layout_constraintBottom_toTopOf="@+id/button_join_room"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

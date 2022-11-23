@@ -5,6 +5,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
@@ -27,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
@@ -43,10 +45,18 @@ public class MainActivity extends AppCompatActivity {
             sb.append(Integer.toHexString(r.nextInt()));
         }
 
-        return sb.substring(0, numChars);
+        return sb.substring(0, numChars).toUpperCase();
     }
 
-    public static void joinRoom(String id) {
+    public void replaceFragment(Fragment fragment){
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.joinRoomFragment,fragment)
+                .commit();
+    }
+
+
+    public static Room joinRoom(String id) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         Query query = db.collection("rooms").whereEqualTo("id", id);
         Map<String, Object> user = new HashMap<>();
@@ -109,8 +119,9 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
+        return activeRoom;
     }
+
 
     public void createRoom(Restaurant[] restaurants) {
         Map<String, Object> room = new HashMap<>();
