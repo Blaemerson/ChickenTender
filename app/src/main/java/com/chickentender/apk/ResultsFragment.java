@@ -1,10 +1,14 @@
 package com.chickentender.apk;
 
+import android.graphics.Bitmap;
 import android.icu.text.SymbolTable;
 import android.os.Bundle;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.fragment.NavHostFragment;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -20,8 +24,10 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -42,10 +48,11 @@ public class ResultsFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private FragmentResultsBinding binding;
+    private String roomID;
+    private List<Restaurant> restaurants;
 
     // TODO: Rename and change types of parameters
     private static Map<String, Integer> results;
-    public static final List<Restaurant> restaurants = null;
 
     public ResultsFragment() {
         // Required empty public constructor
@@ -58,9 +65,10 @@ public class ResultsFragment extends Fragment {
      * @return A new instance of fragment ResultsFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static ResultsFragment newInstance() {
+    public static ResultsFragment newInstance(HashMap<String, Bitmap> imageMap) {
         ResultsFragment fragment = new ResultsFragment();
         Bundle args = new Bundle();
+        args.putSerializable("ImageMap", imageMap);
         fragment.setArguments(args);
         return fragment;
     }
@@ -68,30 +76,75 @@ public class ResultsFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-        }
+
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        roomID = ((MainActivity) getActivity()).getActiveRoom().getRoomID();
+        restaurants = ((MainActivity) getActivity()).getActiveRoom().getRestaurants();
+        OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
+            @Override
+            public void handleOnBackPressed() {
+                // Handle the back button even
+                Log.d("BACKBUTTON", "Back button clicks");
+            }
+        };
+        requireActivity().getOnBackPressedDispatcher().addCallback(this, callback);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
         binding = FragmentResultsBinding.inflate(inflater, container, false);
+        binding.result.setVisibility(View.INVISIBLE);
+        binding.done.setVisibility(View.GONE);
+
+
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-db.collection("votes").document(MainActivity.getActiveRoom().getRoomID()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+db.collection("votes").document(roomID).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
     @Override
     public void onSuccess(DocumentSnapshot documentSnapshot) {
         Map<String, Object> results = documentSnapshot.getData();
-        int mostVotes = 0;
+        long mostVotes = 0;
         Restaurant highest = null;
-        for (Restaurant r : MainActivity.getActiveRoom().getRestaurants()) {
+        for (Restaurant r : restaurants) {
             if (((Long) results.get(r.getRestaurantID())) >= mostVotes) {
+                mostVotes = (Long) results.get(r.getRestaurantID());
                 highest = r;
             }
         }
+
         binding.idRestaurantName.setText(highest.getName());
         binding.idRestaurantLocation.setText(highest.getVicinity());
+        binding.restaurantImg.setImageBitmap(((HashMap<String, Bitmap>) getArguments().get("ImageMap")).get(highest.getName()));
     }
 });
+        ((MainActivity)getActivity()).leaveRoom();
+        db.collection("rooms").document(roomID).addSnapshotListener(new EventListener<DocumentSnapshot>() {
+            @Override
+            public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
+                List<String> users = (List<String>) value.get("users");
+                if (users != null) {
+                    if (users.size() == 0) {
+                        binding.loadingBar.setVisibility(View.GONE);
+                        binding.result.setVisibility(View.VISIBLE);
+                        binding.done.setVisibility(View.VISIBLE);
+                        value.getReference().delete();
+                        db.collection("votes").document(roomID).delete();
+
+                        System.out.println("helo");
+                    }
+                }
+            }
+        });
+
+binding.done.setOnClickListener(new View.OnClickListener() {
+    @Override
+    public void onClick(View view) {
+        NavHostFragment.findNavController(ResultsFragment.this).navigate(R.id.action_Results_to_WelcomeFragment);
+    }
+});
+
         // Inflate the layout for this fragment
         return binding.getRoot();
     }

@@ -80,9 +80,15 @@
     </fragment>
     <fragment
         android:id="@+id/ResultsScreen"
+
         android:name="com.chickentender.apk.ResultsFragment"
         android:label="Results"
         tools:layout="@layout/fragment_results">
+
+        <argument
+            android:name="ImageMap"
+            app:argType="java.util.HashMap"
+            android:defaultValue="@null" />
 
         <action
             android:id="@+id/action_Results_to_WelcomeFragment"

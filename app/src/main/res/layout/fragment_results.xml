@@ -13,10 +13,24 @@
         android:layout_marginBottom="100dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+        <ProgressBar
+            android:id="@+id/loadingBar"
+            android:layout_width="match_parent"
+            android:layout_height="150dp"
+            android:layout_gravity="center"
+            />
         <RelativeLayout
+            android:id="@+id/result"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
+
+            <ImageView
+                android:id="@+id/restaurantImg"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:contentDescription="Restaurant Picture"
+                android:scaleType="centerCrop" />
 
             <TextView
                 android:id="@+id/winnertext"
@@ -60,13 +74,6 @@
                 android:textSize="36sp"
                 android:textStyle="bold" />
 
-            <ImageView
-                android:id="@+id/restaurantImg"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:contentDescription="Restaurant Picture"
-                android:scaleType="centerCrop" />
-
             <TextView
                 android:id="@+id/idRestaurantLocation"
                 android:layout_alignBottom="@id/restaurantImg"
@@ -89,5 +96,19 @@
         </RelativeLayout>
 
     </androidx.cardview.widget.CardView>
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/done"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="20dp"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif-black"
+        android:textColor="@color/quantum_white_100"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:textSize="32sp"
+        android:background="@drawable/round_button_green"
+
+        android:text="DONE" />
 
 </FrameLayout>
