@@ -10,7 +10,6 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -97,7 +96,7 @@ public class WaitingRoomFragment extends Fragment {
             builder.setTitle("Leave this Group?");
             builder.setMessage("If you leave this group, all data will be lost.");
             builder.setPositiveButton("Confirm", (dialog, which) -> {
-                ((MainActivity) getActivity()).deleteRoom();
+                ((MainActivity) getActivity()).leaveRoom();
                 NavHostFragment.findNavController(WaitingRoomFragment.this)
                         .navigate(R.id.action_Waiting_to_WelcomeFragment);
             });

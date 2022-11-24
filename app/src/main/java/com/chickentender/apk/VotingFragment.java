@@ -14,9 +14,11 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavOptions;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -84,6 +86,15 @@ public class VotingFragment extends Fragment {
     {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {}
+        OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
+            @Override
+            public void handleOnBackPressed() {
+                // Handle the back button even
+                Log.d("BACKBUTTON", "Back button clicks");
+            }
+        };
+        requireActivity().getOnBackPressedDispatcher().addCallback(this, callback);
+
     }
 
     public void registerVote(int vote)
@@ -98,7 +109,6 @@ public class VotingFragment extends Fragment {
             voter.put(currentOp.getName(), v);
 
             DocumentReference doc = db.collection("votes").document((MainActivity.getActiveRoom().getRoomID()));
-
             doc.update(currentOp.getRestaurantID(), FieldValue.increment(vote)).addOnSuccessListener(new OnSuccessListener<Void>() {
                 @Override
                 public void onSuccess(Void unused) {
@@ -110,7 +120,6 @@ public class VotingFragment extends Fragment {
                     Log.w("TAG", "Error registering vote", e);
                 }
             });
-
 
             votingResults.put(currentOp, vote);
             System.out.println("Vote: " + currentOp.getName() + " = " + votingResults.get(currentOp));
@@ -127,20 +136,24 @@ public class VotingFragment extends Fragment {
             public void run() {
                 binding.voteCard.setVisibility(View.VISIBLE);
 
-                binding.voteCard.animate().translationX(0).scaleY(1).scaleX(1).setDuration(500).withEndAction(new Runnable() {
+                binding.voteCard.animate().translationX(0).scaleY(1).scaleX(1).setDuration(300).withEndAction(new Runnable() {
                     @Override
                     public void run() {
-
+                        toggleButtons(true);
                     }
                 });
 
             }
         }).start();
         if (index >= restaurants.size() - 1) {
-            NavHostFragment.findNavController(VotingFragment.this).navigate(R.id.action_FinishedVoting);
-        } else {
-            resetCard();
+            ResultsFragment.newInstance(imageMap);
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("ImageMap", imageMap);
+
+            NavHostFragment.findNavController(VotingFragment.this).navigate(
+                    R.id.action_FinishedVoting, bundle);
         }
+        resetCard();
     }
 
     public void resetCard()
@@ -151,12 +164,12 @@ public class VotingFragment extends Fragment {
         binding.idRestaurantName.setText(currentOp.getName());
         binding.idRestaurantLocation.setText(currentOp.getVicinity());
 
-        if (currentOp.getPhoto() == "") {
-            binding.restaurantImg.setImageResource(R.drawable.no_image_available);
-        }
-        else {
-            new DownloadImageTask(binding.restaurantImg).execute(currentOp.getPhoto());
-        }
+//        if (currentOp.getPhoto() == "") {
+//            binding.restaurantImg.setImageResource(R.drawable.no_image_available);
+//        }
+//        else {
+//            new DownloadImageTask(binding.restaurantImg).execute(currentOp.getPhoto());
+//        }
 
         if (currentOp.getUserRating() != "")
         {
@@ -166,8 +179,7 @@ public class VotingFragment extends Fragment {
         {
             binding.rating.setRating(0);
         }
-//        binding.restaurantImg.setImageBitmap(imageMap.get(currentOp.getName()));
-        binding.voteCard.setClickable(true);
+        binding.restaurantImg.setImageBitmap(imageMap.get(currentOp.getName()));
     }
 
     @Override
@@ -176,40 +188,26 @@ public class VotingFragment extends Fragment {
         // Inflate the layout for this fragment
         binding = FragmentVotingBinding.inflate(inflater, container, false);
         restaurants = ((MainActivity)getActivity()).getActiveRoom().getRestaurants();
-//        imageMap = new HashMap<>();
-//
-//        for (Restaurant r : restaurants) {
-//            String imgURL = r.getPhoto();
-//            if (imgURL == "")
-//            {
-//                imageMap.put(r.getName(), BitmapFactory.decodeResource(getResources(), R.drawable.no_image_available));
-//            }
-//            else
-//            {
-//                try {
-//                    imageMap.put(r.getName(), new DownloadImageTask().execute(r.getPhoto()).get());
-//                } catch (ExecutionException e) {
-//                    e.printStackTrace();
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        }
-        return binding.getRoot();
-    }
+        imageMap = new HashMap<>();
 
-    public static Drawable LoadImageFromWebOperations(String url)
-    {
-        try
-        {
-            InputStream is = (InputStream) new URL(url).getContent();
-            Drawable d = Drawable.createFromStream(is, "src name");
-            return d;
+        for (Restaurant r : restaurants) {
+            String imgURL = r.getPhoto();
+            if (imgURL == "")
+            {
+                imageMap.put(r.getName(), BitmapFactory.decodeResource(getResources(), R.drawable.no_image_available));
+            }
+            else
+            {
+                try {
+                    imageMap.put(r.getName(), new DownloadImageTask().execute(r.getPhoto()).get());
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
         }
-        catch (Exception e)
-        {
-            return null;
-        }
+        return binding.getRoot();
     }
 
     public void animateLeft() {
@@ -222,7 +220,6 @@ public class VotingFragment extends Fragment {
                 binding.voteCard.setVisibility(View.INVISIBLE);
 
                 showNextCard();
-
             }
         });
     }
@@ -236,7 +233,6 @@ public class VotingFragment extends Fragment {
                 binding.voteCard.setVisibility(View.INVISIBLE);
 
                 showNextCard();
-
             }
         });
     }
@@ -244,23 +240,11 @@ public class VotingFragment extends Fragment {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             binding.restaurantImg.setColorFilter(Color.argb(.25f, 1.0f, 0.1f, 0.1f));
         }
-        binding.voteCard.animate().scaleX(0.4f).scaleY(0.4f).setDuration(400).withEndAction(new Runnable() {
+        binding.voteCard.animate().scaleX(0.4f).scaleY(0.4f).translationY(2000).setDuration(400).withEndAction(new Runnable() {
             @Override
             public void run() {
-                binding.voteCard.animate().translationY(-200).setDuration(400).setStartDelay(50).withEndAction(new Runnable() {
-                    @Override
-                    public void run() {
-                        binding.voteCard.animate().scaleX(0.2f).scaleY(0.2f).translationY(300).setDuration(500).withEndAction(new Runnable() {
-                            @Override
-                            public void run() {
-                                binding.voteCard.animate().translationY(200).setDuration(400).setStartDelay(50).start();
-                                binding.voteCard.setVisibility(View.INVISIBLE);
-                                showNextCard();
-
-                            }
-                        });
-                    }
-                });
+                binding.voteCard.setVisibility(View.INVISIBLE);
+                showNextCard();
             }
         });
     }
@@ -268,15 +252,21 @@ public class VotingFragment extends Fragment {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             binding.restaurantImg.setColorFilter(Color.argb(.35f, 0.5f, 0.5f, 0.5f));
         }
+        toggleButtons(false);
         binding.voteCard.animate().scaleY(0.4f).scaleX(0.4f).translationY(-2000).setDuration(400).withEndAction(new Runnable() {
             @Override
             public void run() {
                 binding.voteCard.setVisibility(View.INVISIBLE);
 
                 showNextCard();
-
             }
         });
+    }
+    public void toggleButtons(boolean set) {
+        binding.buttonNo.setClickable(set);
+        binding.buttonYes.setClickable(set);
+        binding.buttonMaybe.setClickable(set);
+        binding.buttonHardNo.setClickable(set);
     }
 
     private float x1;
@@ -291,38 +281,39 @@ public class VotingFragment extends Fragment {
 //        System.out.println(restaurants.get(index).getPhoto());
         votingResults = new HashMap<>();
         resetCard();
-        binding.voteCard.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                switch (motionEvent.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        x1 = motionEvent.getX();
-                        y1 = motionEvent.getY();
-                        break;
-                    case MotionEvent.ACTION_UP:
-                        x2 = motionEvent.getX();
-                        y2 = motionEvent.getY();
-                        binding.voteCard.setClickable(false);
-                        break;
-                }
-                if (x1 - x2 > 300) {
-                    registerVote(-1);
-                    animateLeft();
-                    return true;
-                }
-                else if (x1 - x2 < -300) {
-                    registerVote(1);
-                    animateRight();
-                    return true;
-                }
-                return true;
-            }
-        });
+//        binding.voteCard.setOnTouchListener(new View.OnTouchListener() {
+//            @Override
+//            public boolean onTouch(View view, MotionEvent motionEvent) {
+//                switch (motionEvent.getAction()) {
+//                    case MotionEvent.ACTION_DOWN:
+//                        x1 = motionEvent.getX();
+//                        y1 = motionEvent.getY();
+//                        break;
+//                    case MotionEvent.ACTION_UP:
+//                        x2 = motionEvent.getX();
+//                        y2 = motionEvent.getY();
+//                        break;
+//                }
+//                if (x1 - x2 > 300) {
+//                    registerVote(-1);
+//                    animateLeft();
+//                    return true;
+//                }
+//                else if (x1 - x2 < -300) {
+//                    registerVote(1);
+//                    animateRight();
+//                    return true;
+//                }
+//                return true;
+//            }
+//        });
         binding.buttonMaybe.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View view)
             {
+                toggleButtons(false);
+
                 registerVote(0);
                 vibe.vibrate(25);
 
@@ -334,6 +325,8 @@ public class VotingFragment extends Fragment {
             @Override
             public void onClick(View view)
             {
+                toggleButtons(false);
+
                 registerVote(1);
                 vibe.vibrate(25);
 
@@ -345,6 +338,8 @@ public class VotingFragment extends Fragment {
             @Override
             public void onClick(View view)
             {
+                toggleButtons(false);
+
                 registerVote(-1);
                 vibe.vibrate(25);
 
@@ -356,6 +351,7 @@ public class VotingFragment extends Fragment {
             @Override
             public void onClick(View view)
             {
+                toggleButtons(false);
                 vibe.vibrate(25);
 
                 registerVote(-3);
