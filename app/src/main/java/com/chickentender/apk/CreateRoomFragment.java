@@ -319,7 +319,7 @@ public class CreateRoomFragment extends Fragment {
                                              .getJSONObject(0).get("photo_reference")
                                              .toString();
                 String url = "https://maps.googleapis.com/maps/api/place/photo?";
-                String params = "maxwidth=750&photo_reference=" + photoRef + "&key=" + MAPS_API_KEY;
+                String params = "maxwidth=500&photo_reference=" + photoRef + "&key=" + MAPS_API_KEY;
                 photo = url + params;
             }
             catch (Exception e)
