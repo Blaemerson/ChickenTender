@@ -62,7 +62,7 @@
 
         <action
             android:id="@+id/action_FinishedVoting"
-            app:destination="@id/FirstFragment" />
+            app:destination="@id/ResultsScreen" />
     </fragment>
 
     <fragment
@@ -78,5 +78,17 @@
             app:destination="@id/FirstFragment" />
 
     </fragment>
+    <fragment
+        android:id="@+id/ResultsScreen"
+        android:name="com.chickentender.apk.ResultsFragment"
+        android:label="Results"
+        tools:layout="@layout/fragment_results">
+
+        <action
+            android:id="@+id/action_Results_to_WelcomeFragment"
+            app:destination="@id/FirstFragment" />
+
+    </fragment>
+
 
 </navigation>

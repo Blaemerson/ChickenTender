@@ -38,6 +38,9 @@ public class MainActivity extends AppCompatActivity {
     private static String userID;
     private static Room activeRoom;
 
+    public static String getUserID() {
+        return userID;
+    }
     private String getRandomHexString(int numChars) {
         Random r = new Random();
         StringBuilder sb = new StringBuilder();
@@ -126,6 +129,7 @@ public class MainActivity extends AppCompatActivity {
     public void createRoom(Restaurant[] restaurants) {
         Map<String, Object> room = new HashMap<>();
         List<String> userIDs = new ArrayList<>();
+        Map<String, Object> votes = new HashMap<>();
 
         userIDs.add(userID);
         Map<String, Object> user = new HashMap<>();
@@ -137,28 +141,42 @@ public class MainActivity extends AppCompatActivity {
         room.put("hostID", userID);
         room.put("restaurants", Arrays.asList(restaurants));
 
+        for (Restaurant r : restaurants) {
+            votes.put(r.getRestaurantID(), 0);
+        }
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
         db.collection("users").document(userID).set(user).addOnSuccessListener(new OnSuccessListener() {
             @Override
             public void onSuccess(Object o) {
-                Log.w("TAG", "Success adding document");
-
+                Log.w("TAG", "Success adding user");
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                Log.w("TAG", "Error adding document", e);
+                Log.w("TAG", "Error adding user", e);
             }
         });
         db.collection("rooms").document(roomID).set(room).addOnSuccessListener(new OnSuccessListener() {
             @Override
             public void onSuccess(Object o) {
+                Log.w("TAG", "Success adding room");
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                Log.w("TAG", "Error adding document", e);
+                Log.w("TAG", "Error adding room", e);
+            }
+        });
+        db.collection("votes").document(roomID).set(votes).addOnSuccessListener(new OnSuccessListener() {
+            @Override
+            public void onSuccess(Object o) {
+                Log.w("TAG", "Success adding votes");
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.w("TAG", "Error adding votes", e);
             }
         });
 
@@ -167,7 +185,8 @@ public class MainActivity extends AppCompatActivity {
 
     public void deleteRoom() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        Query query = db.collection("rooms").whereEqualTo("id", activeRoom.getRoomID());
+        String roomID = activeRoom.getRoomID();
+        Query query = db.collection("rooms").whereEqualTo("id", roomID);
 
         Map<String, Object> user = new HashMap<>();
         query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -184,6 +203,7 @@ public class MainActivity extends AppCompatActivity {
                         if (users.isEmpty()) {
                             Log.d("DEBUG", "Deleted room because it has no users");
                             document.getReference().delete();
+                            db.collection("votes").document(roomID).delete();
                         }
                     }
 
@@ -201,7 +221,7 @@ public class MainActivity extends AppCompatActivity {
         this.activeRoom = null;
     }
 
-    public Room getActiveRoom() {
+    public static Room getActiveRoom() {
         return activeRoom;
     }
 

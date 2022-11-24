@@ -1,12 +1,14 @@
 package com.chickentender.apk;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 
+import android.os.Handler;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -89,17 +91,25 @@ public class JoinRoomFragment extends Fragment
                 @Override
                 public void onClick(View view)
                 {
-                    if (MainActivity.joinRoom(binding.editTextRoomID.getText().toString()) != null)
-                    {
-                        Toast.makeText(getContext(), "Joined Room", Toast.LENGTH_SHORT).show();
-                        NavHostFragment.findNavController(JoinRoomFragment.this)
-                                .navigate(R.id.action_Join_to_WaitingRoom);
+                    MainActivity.joinRoom(binding.editTextRoomID.getText().toString());
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (((MainActivity)getActivity()).getActiveRoom() != null)
+                            {
+                                Toast.makeText(getContext(), "Joined Room", Toast.LENGTH_SHORT).show();
+                                NavHostFragment.findNavController(JoinRoomFragment.this)
+                                        .navigate(R.id.action_Join_to_WaitingRoom);
 
-                    }
-                    else
-                    {
-                        Toast.makeText(getContext(), "Failed to Find Room", Toast.LENGTH_SHORT).show();
-                    }
+                            }
+                            else
+                            {
+                                Toast.makeText(getContext(), "Failed to Find Room", Toast.LENGTH_SHORT).show();
+                            }
+
+                        }
+                    }, 1000);
+
                 }
             }
         );

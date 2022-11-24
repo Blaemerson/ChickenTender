@@ -31,15 +31,23 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.chickentender.apk.databinding.FragmentVotingBinding;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FieldPath;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firestore.v1.DocumentTransform;
 
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 public class VotingFragment extends Fragment {
@@ -75,34 +83,35 @@ public class VotingFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-//        db.collection("rooms").whereEqualTo()
-//        document.getReference().addSnapshotListener(new EventListener<DocumentSnapshot>() {
-//            @Override
-//            public void onEvent(@Nullable DocumentSnapshot snapshot,
-//                                @Nullable FirebaseFirestoreException e) {
-//                if (e != null) {
-//                    Log.w("TAG", "Listen failed.", e);
-//                    return;
-//                }
-//
-//                String source = snapshot != null && snapshot.getMetadata().hasPendingWrites()
-//                        ? "Local" : "Server";
-//
-//                if (snapshot != null && snapshot.exists()) {
-//                    Log.d("TAG", source + " data: " + snapshot.getData());
-//                } else {
-//                    Log.d("TAG", source + " data: null");
-//                }
-//            }
-//        });
         if (getArguments() != null) {}
     }
 
     public void registerVote(int vote)
     {
-        if (restaurants.indexOf(currentOp) < restaurants.size() - 1)
+        if (restaurants.indexOf(currentOp) < restaurants.size())
         {
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+            Map<String, Object> v = new HashMap<>();
+
+            Map<String, Object> voter = new HashMap<>();
+            v.put("votes", vote);
+            voter.put(currentOp.getName(), v);
+
+            DocumentReference doc = db.collection("votes").document((MainActivity.getActiveRoom().getRoomID()));
+
+            doc.update(currentOp.getRestaurantID(), FieldValue.increment(vote)).addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void unused) {
+                    Log.w("TAG", "Success registering vote");
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Log.w("TAG", "Error registering vote", e);
+                }
+            });
+
+
             votingResults.put(currentOp, vote);
             System.out.println("Vote: " + currentOp.getName() + " = " + votingResults.get(currentOp));
             index++;
