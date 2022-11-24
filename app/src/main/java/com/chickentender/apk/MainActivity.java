@@ -28,7 +28,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
@@ -187,7 +186,22 @@ public class MainActivity extends AppCompatActivity {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         String roomID = activeRoom.getRoomID();
         Query query = db.collection("rooms").whereEqualTo("id", roomID);
-
+        query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                            document.getReference().delete();
+                            db.collection("votes").document(roomID).delete();
+                    }
+                }
+            }
+        });
+    }
+    public void leaveRoom() {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        String roomID = activeRoom.getRoomID();
+        Query query = db.collection("rooms").whereEqualTo("id", roomID);
         Map<String, Object> user = new HashMap<>();
         query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
