@@ -160,7 +160,9 @@ public class VotingFragment extends Fragment {
     {
         binding.restaurantImg.clearColorFilter();
 
-        currentOp = restaurants.get(index);
+        if (index < restaurants.size()) {
+            currentOp = restaurants.get(index);
+        }
         binding.idRestaurantName.setText(currentOp.getName());
         binding.idRestaurantLocation.setText(currentOp.getVicinity());
 

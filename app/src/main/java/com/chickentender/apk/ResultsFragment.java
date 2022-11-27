@@ -140,8 +140,7 @@ db.collection("votes").document(roomID).get().addOnSuccessListener(new OnSuccess
 binding.done.setOnClickListener(new View.OnClickListener() {
     @Override
     public void onClick(View view) {
-        Intent i = new Intent(getContext(), SplashScreenActivity.class);
-        startActivity(i);
+        NavHostFragment.findNavController(ResultsFragment.this).navigate(R.id.action_Results_to_WelcomeFragment);
     }
 });
 
