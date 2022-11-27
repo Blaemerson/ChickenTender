@@ -267,6 +267,7 @@ public class VotingFragment extends Fragment {
         binding.buttonYes.setClickable(set);
         binding.buttonMaybe.setClickable(set);
         binding.buttonHardNo.setClickable(set);
+        binding.buttonLove.setClickable(set);
     }
 
     private float x1;
@@ -317,6 +318,7 @@ public class VotingFragment extends Fragment {
                 registerVote(0);
                 vibe.vibrate(25);
 
+                binding.imageView2.setImageResource(R.drawable.meh_48_px);
                 animateUp();
             }
         });
@@ -329,6 +331,22 @@ public class VotingFragment extends Fragment {
 
                 registerVote(1);
                 vibe.vibrate(25);
+                binding.imageView2.setImageResource(R.drawable.thumbs_up_48_px);
+
+                animateRight();
+            }
+        });
+        binding.buttonLove.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View view)
+            {
+                toggleButtons(false);
+
+                registerVote(2);
+                vibe.vibrate(25);
+                binding.imageView2.setImageResource(R.drawable.logo_hires);
+
 
                 animateRight();
             }
@@ -342,6 +360,8 @@ public class VotingFragment extends Fragment {
 
                 registerVote(-1);
                 vibe.vibrate(25);
+                binding.imageView2.setImageResource(R.drawable.thumbs_down_48_px);
+
 
                 animateLeft();
             }
@@ -353,10 +373,12 @@ public class VotingFragment extends Fragment {
             {
                 toggleButtons(false);
                 vibe.vibrate(25);
+                binding.imageView2.setImageResource(R.drawable.slash_48px);
+
 
                 registerVote(-3);
 
-                animateDown();
+                animateLeft();
             }
         });
 

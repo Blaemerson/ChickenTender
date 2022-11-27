@@ -1,5 +1,6 @@
 package com.chickentender.apk;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.icu.text.SymbolTable;
 import android.os.Bundle;
@@ -131,8 +132,6 @@ db.collection("votes").document(roomID).get().addOnSuccessListener(new OnSuccess
                         binding.done.setVisibility(View.VISIBLE);
                         value.getReference().delete();
                         db.collection("votes").document(roomID).delete();
-
-                        System.out.println("helo");
                     }
                 }
             }
@@ -141,7 +140,8 @@ db.collection("votes").document(roomID).get().addOnSuccessListener(new OnSuccess
 binding.done.setOnClickListener(new View.OnClickListener() {
     @Override
     public void onClick(View view) {
-        NavHostFragment.findNavController(ResultsFragment.this).navigate(R.id.action_Results_to_WelcomeFragment);
+        Intent i = new Intent(getContext(), SplashScreenActivity.class);
+        startActivity(i);
     }
 });
 

@@ -5,20 +5,40 @@
     android:layout_height="match_parent"
     tools:context=".ResultsFragment">
 
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="112dp"
+        android:layout_height="135dp"
+        android:layout_gravity="center_horizontal"
+        android:src="@drawable/logo_hires" />
+
     <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="453dp"
         android:layout_gravity="center"
-        android:layout_marginRight="10dp"
         android:layout_marginLeft="10dp"
         android:layout_marginTop="100dp"
-        android:layout_marginBottom="100dp"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_marginRight="10dp"
+        android:layout_marginBottom="100dp">
+
         <ProgressBar
             android:id="@+id/loadingBar"
             android:layout_width="match_parent"
             android:layout_height="150dp"
+            android:layout_gravity="center" />
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_gravity="center"
-            />
+            android:gravity="center_horizontal"
+            android:fontFamily="sans-serif-black"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:textSize="32sp"
+            android:text="Receiving Votes..." />
+
         <RelativeLayout
             android:id="@+id/result"
             android:layout_width="match_parent"
@@ -34,9 +54,9 @@
 
             <TextView
                 android:id="@+id/winnertext"
-                android:layout_alignTop="@id/restaurantImg"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_alignTop="@id/restaurantImg"
                 android:layout_gravity="center_horizontal|top"
                 android:fontFamily="sans-serif-black"
                 android:gravity="center"
@@ -76,9 +96,9 @@
 
             <TextView
                 android:id="@+id/idRestaurantLocation"
-                android:layout_alignBottom="@id/restaurantImg"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
+                android:layout_alignBottom="@id/restaurantImg"
                 android:layout_gravity="bottom"
                 android:layout_marginLeft="10dp"
                 android:layout_marginBottom="10dp"
