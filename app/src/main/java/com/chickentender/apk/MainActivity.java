@@ -214,11 +214,11 @@ public class MainActivity extends AppCompatActivity {
                             users.remove(userID);
                             db.collection("rooms").document(document.getId()).update("users", users);
                         }
-                        if (users.isEmpty()) {
-                            Log.d("DEBUG", "Deleted room because it has no users");
-                            document.getReference().delete();
-                            db.collection("votes").document(roomID).delete();
-                        }
+//                        if (users.isEmpty()) {
+//                            Log.d("DEBUG", "Deleted room because it has no users");
+//                            document.getReference().delete();
+//                            db.collection("votes").document(roomID).delete();
+//                        }
                     }
 
                     for (QueryDocumentSnapshot document : task.getResult()) {

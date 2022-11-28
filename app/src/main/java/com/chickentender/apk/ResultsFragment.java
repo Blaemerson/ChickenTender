@@ -102,10 +102,10 @@ public class ResultsFragment extends Fragment {
 
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-db.collection("votes").document(roomID).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+db.collection("votes").document(roomID).addSnapshotListener(new EventListener<DocumentSnapshot>() {
     @Override
-    public void onSuccess(DocumentSnapshot documentSnapshot) {
-        Map<String, Object> results = documentSnapshot.getData();
+    public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
+        Map<String, Object> results = value.getData();
         long mostVotes = 0;
         Restaurant highest = null;
         for (Restaurant r : restaurants) {
@@ -120,6 +120,23 @@ db.collection("votes").document(roomID).get().addOnSuccessListener(new OnSuccess
         binding.restaurantImg.setImageBitmap(((HashMap<String, Bitmap>) getArguments().get("ImageMap")).get(highest.getName()));
     }
 });
+//    @Override
+//    public void onSuccess(DocumentSnapshot documentSnapshot) {
+//        Map<String, Object> results = documentSnapshot.getData();
+//        long mostVotes = 0;
+//        Restaurant highest = null;
+//        for (Restaurant r : restaurants) {
+//            if (((Long) results.get(r.getRestaurantID())) >= mostVotes) {
+//                mostVotes = (Long) results.get(r.getRestaurantID());
+//                highest = r;
+//            }
+//        }
+//
+//        binding.idRestaurantName.setText(highest.getName());
+//        binding.idRestaurantLocation.setText(highest.getVicinity());
+//        binding.restaurantImg.setImageBitmap(((HashMap<String, Bitmap>) getArguments().get("ImageMap")).get(highest.getName()));
+//    }
+//});
         ((MainActivity)getActivity()).leaveRoom();
         db.collection("rooms").document(roomID).addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
@@ -131,7 +148,7 @@ db.collection("votes").document(roomID).get().addOnSuccessListener(new OnSuccess
                         binding.result.setVisibility(View.VISIBLE);
                         binding.done.setVisibility(View.VISIBLE);
                         value.getReference().delete();
-                        db.collection("votes").document(roomID).delete();
+//                        db.collection("votes").document(roomID).delete();
                     }
                 }
             }
