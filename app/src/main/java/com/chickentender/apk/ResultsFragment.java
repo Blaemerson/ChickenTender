@@ -1,12 +1,9 @@
 package com.chickentender.apk;
 
-import android.content.Intent;
 import android.graphics.Bitmap;
-import android.icu.text.SymbolTable;
 import android.os.Bundle;
 
 import androidx.activity.OnBackPressedCallback;
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
@@ -17,55 +14,25 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.chickentender.apk.databinding.FragmentResultsBinding;
-import com.chickentender.apk.databinding.FragmentWaitingRoomBinding;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
-import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link ResultsFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class ResultsFragment extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private FragmentResultsBinding binding;
     private String roomID;
     private List<Restaurant> restaurants;
-
-    // TODO: Rename and change types of parameters
-    private static Map<String, Integer> results;
+    private boolean finished = false;
 
     public ResultsFragment() {
-        // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @return A new instance of fragment ResultsFragment.
-     */
-    // TODO: Rename and change types and number of parameters
     public static ResultsFragment newInstance(HashMap<String, Bitmap> imageMap) {
         ResultsFragment fragment = new ResultsFragment();
         Bundle args = new Bundle();
@@ -77,8 +44,6 @@ public class ResultsFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
 
         roomID = ((MainActivity) getActivity()).getActiveRoom().getRoomID();
         restaurants = ((MainActivity) getActivity()).getActiveRoom().getRestaurants();
@@ -102,24 +67,28 @@ public class ResultsFragment extends Fragment {
 
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-db.collection("votes").document(roomID).addSnapshotListener(new EventListener<DocumentSnapshot>() {
-    @Override
-    public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
-        Map<String, Object> results = value.getData();
-        long mostVotes = 0;
-        Restaurant highest = null;
-        for (Restaurant r : restaurants) {
-            if (((Long) results.get(r.getRestaurantID())) >= mostVotes) {
-                mostVotes = (Long) results.get(r.getRestaurantID());
-                highest = r;
-            }
-        }
+        db.collection("votes").document(roomID).addSnapshotListener(new EventListener<DocumentSnapshot>() {
+            @Override
+            public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
+                Map<String, Object> results = value.getData();
+                long mostVotes = 0;
+                Restaurant highest = null;
+                // Update the highest scorer
+                if (value.exists()) {
+                    for (Restaurant r : restaurants) {
+                        if (((Long) results.get(r.getRestaurantID())) >= mostVotes) {
+                            mostVotes = (Long) results.get(r.getRestaurantID());
+                            highest = r;
+                        }
+                    }
 
-        binding.idRestaurantName.setText(highest.getName());
-        binding.idRestaurantLocation.setText(highest.getVicinity());
-        binding.restaurantImg.setImageBitmap(((HashMap<String, Bitmap>) getArguments().get("ImageMap")).get(highest.getName()));
-    }
-});
+                    binding.idRestaurantName.setText(highest.getName());
+                    binding.idRestaurantLocation.setText(highest.getVicinity());
+                    binding.restaurantImg.setImageBitmap(((HashMap<String, Bitmap>) getArguments().get("ImageMap")).get(highest.getName()));
+                }
+
+            }
+        });
 //    @Override
 //    public void onSuccess(DocumentSnapshot documentSnapshot) {
 //        Map<String, Object> results = documentSnapshot.getData();
@@ -147,19 +116,26 @@ db.collection("votes").document(roomID).addSnapshotListener(new EventListener<Do
                         binding.loadingBar.setVisibility(View.GONE);
                         binding.result.setVisibility(View.VISIBLE);
                         binding.done.setVisibility(View.VISIBLE);
-                        value.getReference().delete();
-//                        db.collection("votes").document(roomID).delete();
+//                        value.getReference().delete();
+                        finished = true;
                     }
                 }
             }
         });
 
-binding.done.setOnClickListener(new View.OnClickListener() {
-    @Override
-    public void onClick(View view) {
-        NavHostFragment.findNavController(ResultsFragment.this).navigate(R.id.action_Results_to_WelcomeFragment);
-    }
-});
+        binding.done.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Delete room and votes table if there are no more users in the room.
+                if (finished == true) {
+                    db.collection("rooms").document(roomID).delete();
+
+                    db.collection("votes").document(roomID).delete();
+                }
+
+                NavHostFragment.findNavController(ResultsFragment.this).navigate(R.id.action_Results_to_WelcomeFragment);
+            }
+        });
 
         // Inflate the layout for this fragment
         return binding.getRoot();
